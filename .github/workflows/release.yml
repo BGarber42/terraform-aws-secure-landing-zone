@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  TF_REGISTRY_DISCOVERY_URL: https://registry.terraform.io/v1/modules
+
+jobs:
+  release:
+    name: Release to Terraform Registry
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: "1.9.0"
+        
+    - name: Terraform Format Check
+      run: terraform fmt -check -recursive
+      
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: v0.50.0
+        
+    - name: TFLint
+      run: tflint --init && tflint
+      
+    - name: Publish to Terraform Registry
+      env:
+        TF_REGISTRY_TOKEN: ${{ secrets.TF_REGISTRY_TOKEN }}
+      run: |
+        # Extract version from tag
+        VERSION=${GITHUB_REF#refs/tags/}
+        
+        # Create release archive
+        git archive --format=zip --output=module.zip HEAD
+        
+        # Upload to Terraform Registry
+        curl -X PUT \
+          -H "Authorization: Bearer $TF_REGISTRY_TOKEN" \
+          -H "Content-Type: application/octet-stream" \
+          --data-binary @module.zip \
+          "$TF_REGISTRY_DISCOVERY_URL/${{ github.repository }}/$VERSION" 
