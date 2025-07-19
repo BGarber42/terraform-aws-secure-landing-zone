@@ -1,0 +1,17 @@
+# AWS Account ID (required)
+account_id = "123456789012"
+
+# AWS region (optional, defaults to us-east-1)
+region = "us-east-1"
+
+# CloudTrail S3 bucket name (required)
+# Must be globally unique
+cloudtrail_bucket_name = "my-org-cloudtrail-logs-2024"
+
+# Tags to apply to all resources (optional)
+tags = {
+  Environment = "development"
+  Owner       = "platform-team"
+  Project     = "landing-zone"
+  CostCenter  = "IT-001"
+} 
