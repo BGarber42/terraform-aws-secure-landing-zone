@@ -23,23 +23,23 @@ module "landing_zone" {
   tags                    = var.tags
 }
 
-# Outputs will be added as modules are implemented
+# Outputs from the landing zone module
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = "placeholder"
+  value       = module.landing_zone.vpc_id
 }
 
 output "public_subnet_ids" {
   description = "List of public subnet IDs"
-  value       = ["placeholder"]
+  value       = module.landing_zone.public_subnet_ids
 }
 
 output "private_subnet_ids" {
   description = "List of private subnet IDs"
-  value       = ["placeholder"]
+  value       = module.landing_zone.private_subnet_ids
 }
 
 output "cloudtrail_bucket_arn" {
   description = "ARN of the CloudTrail S3 bucket"
-  value       = "placeholder"
+  value       = module.landing_zone.cloudtrail_bucket_arn
 } 
