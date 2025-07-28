@@ -39,10 +39,11 @@ module "cloudtrail" {
 module "config" {
   source = "./config"
 
-  account_id    = var.account_id
-  region        = var.region
-  config_rules  = var.config_rules
-  tags          = var.tags
+  account_id        = var.account_id
+  region            = var.region
+  config_bucket_name = var.cloudtrail_bucket_name
+  config_rules      = var.config_rules
+  tags              = var.tags
 }
 
 # IAM Module
