@@ -60,10 +60,11 @@ module "iam" {
 module "guardduty" {
   source = "./guardduty"
 
-  account_id         = var.account_id
-  region             = var.region
-  enable_guardduty   = var.enable_guardduty
-  tags               = var.tags
+  account_id                    = var.account_id
+  region                        = var.region
+  enable_guardduty              = var.enable_guardduty
+  guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
+  tags                          = var.tags
 }
 
 # Budget Module
@@ -72,6 +73,8 @@ module "budget" {
 
   account_id                  = var.account_id
   region                      = var.region
+  enable_budget_alerts        = var.enable_budget_alerts
+  enable_budget_actions       = var.enable_budget_actions
   budget_limit_usd            = var.budget_limit_usd
   budget_alert_subscribers    = var.budget_alert_subscribers
   tags                        = var.tags

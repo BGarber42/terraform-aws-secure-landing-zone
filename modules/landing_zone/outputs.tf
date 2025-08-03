@@ -59,6 +59,38 @@ output "iam_role_names" {
 
 # GuardDuty Outputs
 output "guardduty_detector_id" {
+  description = "ID of the GuardDuty detector"
+  value       = module.guardduty.detector_id
+}
+
+output "guardduty_detector_arn" {
+  description = "ARN of the GuardDuty detector"
+  value       = module.guardduty.detector_arn
+}
+
+output "guardduty_findings_bucket_arn" {
+  description = "ARN of the GuardDuty findings S3 bucket"
+  value       = module.guardduty.findings_bucket_arn
+}
+
+# Budget Outputs
+output "budget_id" {
+  description = "ID of the cost budget"
+  value       = module.budget.budget_id
+}
+
+output "budget_arn" {
+  description = "ARN of the cost budget"
+  value       = module.budget.budget_arn
+}
+
+output "budget_sns_topic_arn" {
+  description = "ARN of the SNS topic for budget alerts"
+  value       = module.budget.sns_topic_arn
+}
+
+# GuardDuty Outputs
+output "guardduty_detector_id" {
   description = "ID of the GuardDuty detector (null if disabled)"
   value       = module.guardduty.detector_id
 }

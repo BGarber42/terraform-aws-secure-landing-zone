@@ -94,7 +94,25 @@ variable "enable_guardduty" {
   default     = true
 }
 
+variable "guardduty_findings_bucket_name" {
+  description = "Name of the S3 bucket for GuardDuty findings"
+  type        = string
+  default     = ""
+}
+
 # Budget Variables
+variable "enable_budget_alerts" {
+  description = "Enable budget alerts and notifications"
+  type        = bool
+  default     = true
+}
+
+variable "enable_budget_actions" {
+  description = "Enable budget actions for automated responses"
+  type        = bool
+  default     = false
+}
+
 variable "budget_limit_usd" {
   description = "Monthly budget limit in USD"
   type        = number
