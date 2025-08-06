@@ -78,4 +78,32 @@ module "budget" {
   budget_limit_usd            = var.budget_limit_usd
   budget_alert_subscribers    = var.budget_alert_subscribers
   tags                        = var.tags
+}
+
+# Security Hub Module
+module "security_hub" {
+  source = "./security_hub"
+
+  account_id              = var.account_id
+  region                  = var.region
+  enable_security_hub     = var.enable_security_hub
+  enable_cis_standard     = var.enable_cis_standard
+  enable_pci_standard     = var.enable_pci_standard
+  enable_action_targets   = var.enable_action_targets
+  tags                    = var.tags
+}
+
+# Macie Module
+module "macie" {
+  source = "./macie"
+
+  account_id                    = var.account_id
+  region                        = var.region
+  enable_macie                  = var.enable_macie
+  finding_publishing_frequency  = var.macie_finding_publishing_frequency
+  enable_s3_classification      = var.enable_macie_s3_classification
+  s3_buckets_to_scan           = var.macie_s3_buckets_to_scan
+  excluded_file_extensions      = var.macie_excluded_file_extensions
+  custom_data_identifiers       = var.macie_custom_data_identifiers
+  tags                          = var.tags
 } 

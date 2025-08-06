@@ -89,39 +89,54 @@ output "budget_sns_topic_arn" {
   value       = module.budget.sns_topic_arn
 }
 
-# GuardDuty Outputs
-output "guardduty_detector_id" {
-  description = "ID of the GuardDuty detector (null if disabled)"
-  value       = module.guardduty.detector_id
+# Security Hub Outputs
+output "security_hub_enabled" {
+  description = "Whether Security Hub is enabled"
+  value       = module.security_hub.security_hub_enabled
 }
 
-output "guardduty_detector_arn" {
-  description = "ARN of the GuardDuty detector (null if disabled)"
-  value       = module.guardduty.detector_arn
+output "cis_standard_enabled" {
+  description = "Whether CIS AWS Foundations Benchmark standard is enabled"
+  value       = module.security_hub.cis_standard_enabled
 }
 
-# Budget Outputs
-output "budget_id" {
-  description = "ID of the budget (null if budget not created)"
-  value       = module.budget.budget_id
+output "pci_standard_enabled" {
+  description = "Whether PCI DSS standard is enabled"
+  value       = module.security_hub.pci_standard_enabled
 }
 
-output "budget_arn" {
-  description = "ARN of the budget (null if budget not created)"
-  value       = module.budget.budget_arn
+output "security_hub_action_targets_enabled" {
+  description = "Whether Security Hub action targets are enabled"
+  value       = module.security_hub.action_targets_enabled
+}
+
+output "security_hub_insights_created" {
+  description = "Number of Security Hub insights created"
+  value       = module.security_hub.insights_created
+}
+
+# Macie Outputs
+output "macie_enabled" {
+  description = "Whether Macie is enabled"
+  value       = module.macie.macie_enabled
+}
+
+output "macie_classification_job_enabled" {
+  description = "Whether S3 classification job is enabled"
+  value       = module.macie.classification_job_enabled
+}
+
+output "macie_custom_identifiers_count" {
+  description = "Number of custom data identifiers created"
+  value       = module.macie.custom_identifiers_count
+}
+
+output "macie_buckets_to_scan_count" {
+  description = "Number of S3 buckets configured for scanning"
+  value       = module.macie.buckets_to_scan_count
 }
 
 # Optional Feature Outputs
-output "security_hub_enabled" {
-  description = "Whether Security Hub is enabled"
-  value       = var.enable_security_hub
-}
-
-output "macie_enabled" {
-  description = "Whether Macie is enabled"
-  value       = var.enable_macie
-}
-
 output "s3_block_public_access_enabled" {
   description = "Whether S3 Block Public Access is enabled"
   value       = var.enable_s3_block_public_access

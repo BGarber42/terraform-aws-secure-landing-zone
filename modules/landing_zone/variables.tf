@@ -125,19 +125,79 @@ variable "budget_alert_subscribers" {
   default     = []
 }
 
-# Optional Feature Toggles
+# Security Hub Variables
 variable "enable_security_hub" {
   description = "Enable AWS Security Hub"
   type        = bool
   default     = false
 }
 
+variable "enable_cis_standard" {
+  description = "Enable CIS AWS Foundations Benchmark standard"
+  type        = bool
+  default     = true
+}
+
+variable "enable_pci_standard" {
+  description = "Enable PCI DSS standard"
+  type        = bool
+  default     = false
+}
+
+variable "enable_action_targets" {
+  description = "Enable Security Hub action targets"
+  type        = bool
+  default     = true
+}
+
+# Macie Variables
 variable "enable_macie" {
   description = "Enable Amazon Macie"
   type        = bool
   default     = false
 }
 
+variable "macie_finding_publishing_frequency" {
+  description = "Frequency for publishing Macie findings"
+  type        = string
+  default     = "FIFTEEN_MINUTES"
+  
+  validation {
+    condition     = contains(["FIFTEEN_MINUTES", "ONE_HOUR", "SIX_HOURS"], var.macie_finding_publishing_frequency)
+    error_message = "Finding publishing frequency must be one of: FIFTEEN_MINUTES, ONE_HOUR, SIX_HOURS."
+  }
+}
+
+variable "enable_macie_s3_classification" {
+  description = "Enable S3 classification job for Macie"
+  type        = bool
+  default     = true
+}
+
+variable "macie_s3_buckets_to_scan" {
+  description = "List of S3 bucket names to scan with Macie"
+  type        = list(string)
+  default     = []
+}
+
+variable "macie_excluded_file_extensions" {
+  description = "File extensions to exclude from Macie scanning"
+  type        = list(string)
+  default     = ["jpg", "jpeg", "png", "gif", "mp4", "avi", "mov"]
+}
+
+variable "macie_custom_data_identifiers" {
+  description = "Map of custom data identifiers for Macie"
+  type = map(object({
+    description   = string
+    regex        = string
+    keywords     = list(string)
+    ignore_words = list(string)
+  }))
+  default = {}
+}
+
+# Optional Feature Toggles
 variable "enable_s3_block_public_access" {
   description = "Enable S3 Block Public Access"
   type        = bool
