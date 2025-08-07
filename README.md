@@ -94,9 +94,26 @@ See the `examples/` directory for complete usage examples:
 - `examples/full/` - Complete configuration with all optional features enabled
 - `examples/advanced/` - Advanced configuration with Security Hub and Macie features
 
-## Testing
+## Development
 
-### Local Testing
+### Git Workflow
+
+This project uses a **linear history workflow** to maintain clean commit history and simplify release management. See [docs/git-workflow.md](docs/git-workflow.md) for detailed workflow documentation.
+
+**Key Benefits:**
+- Clean linear commit history
+- No merge commit clutter
+- Easy release management
+- Proper Terraform Registry compatibility
+
+**Quick Workflow:**
+1. Create feature branch from `develop`
+2. Make changes and create PR to `develop`
+3. Merge with rebase to maintain linear history
+4. When ready for release, fast-forward merge `develop` → `main`
+5. Tag and release from `main`
+
+### Testing
 
 Run the Terratest suite locally:
 

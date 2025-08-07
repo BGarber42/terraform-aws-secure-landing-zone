@@ -65,6 +65,9 @@ testing-guide.md
 scripts/*-branch-protection.ps1
 scripts/*-branch-protection.sh
 
+# Release scripts (run locally, not committed)
+scripts/release.ps1
+
 # Test artifacts
 test-results/
 coverage/
