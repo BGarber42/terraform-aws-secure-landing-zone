@@ -4,6 +4,162 @@
 
 The Terraform AWS Secure Landing Zone provides a comprehensive foundation for AWS account security and compliance. This document outlines the architecture and design decisions.
 
+## System Architecture Diagram
+
+```mermaid
+graph TB
+    %% User/Developer
+    User[👤 Developer/Admin]
+    
+    %% Terraform Configuration
+    TF[📋 Terraform Configuration]
+    TF --> |deploys| LandingZone
+    
+    %% Main Landing Zone Module
+    subgraph LandingZone [🏗️ Landing Zone Module]
+        VPC[🌐 VPC Network]
+        CloudTrail[📊 CloudTrail Logging]
+        Config[⚙️ AWS Config]
+        GuardDuty[🛡️ GuardDuty]
+        SecurityHub[🔒 Security Hub]
+        Macie[🔍 Macie]
+        IAM[👤 IAM Roles]
+        Budget[💰 Budget Alerts]
+    end
+    
+    %% AWS Services
+    subgraph AWS [☁️ AWS Services]
+        S3[(🗄️ S3 Buckets)]
+        KMS[🔑 KMS Keys]
+        SNS[📢 SNS Topics]
+        CloudWatch[📈 CloudWatch]
+    end
+    
+    %% Resource Protection Strategy
+    subgraph Protection [🛡️ Resource Protection]
+        PreventDestroy{prevent_destroy?}
+        Protected[🔒 Protected Resources]
+        Unprotected[🔓 Unprotected Resources]
+        
+        PreventDestroy -->|true| Protected
+        PreventDestroy -->|false| Unprotected
+    end
+    
+    %% Connections
+    LandingZone --> AWS
+    CloudTrail --> S3
+    GuardDuty --> S3
+    Config --> SNS
+    SecurityHub --> CloudWatch
+    
+    %% Protection Implementation
+    S3 --> Protection
+    KMS --> Protection
+    
+    %% User Interactions
+    User --> TF
+    User --> |test deployment| TestDeploy[🧪 Test Deployment]
+    User --> |production deployment| ProdDeploy[🚀 Production Deployment]
+    
+    %% Deployment Types
+    TestDeploy --> |prevent_destroy=false| LandingZone
+    ProdDeploy --> |prevent_destroy=true| LandingZone
+    
+    %% Styling
+    classDef awsService fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:#fff
+    classDef terraform fill:#7B42BC,stroke:#000,stroke-width:2px,color:#fff
+    classDef protection fill:#FF6B6B,stroke:#000,stroke-width:2px,color:#fff
+    classDef user fill:#4ECDC4,stroke:#000,stroke-width:2px,color:#fff
+    
+    class S3,KMS,SNS,CloudWatch awsService
+    class TF,LandingZone terraform
+    class Protection,Protected,Unprotected protection
+    class User,TestDeploy,ProdDeploy user
+```
+
+## Detailed Component Architecture
+
+```mermaid
+graph LR
+    %% Network Layer
+    subgraph Network [🌐 Network Layer]
+        VPC[VPC<br/>10.0.0.0/16]
+        IGW[Internet Gateway]
+        NAT[NAT Gateway]
+        
+        subgraph Subnets [Subnets]
+            Public1[Public Subnet 1<br/>10.0.1.0/24]
+            Public2[Public Subnet 2<br/>10.0.2.0/24]
+            Private1[Private Subnet 1<br/>10.0.3.0/24]
+            Private2[Private Subnet 2<br/>10.0.4.0/24]
+        end
+    end
+    
+    %% Security Layer
+    subgraph Security [🛡️ Security Layer]
+        CT[CloudTrail<br/>API Logging]
+        AC[AWS Config<br/>Compliance]
+        GD[GuardDuty<br/>Threat Detection]
+        SH[Security Hub<br/>Findings]
+        MC[Macie<br/>Data Classification]
+    end
+    
+    %% Storage Layer
+    subgraph Storage [🗄️ Storage Layer]
+        CTBucket[CloudTrail Bucket<br/>Logs Storage]
+        GDBucket[GuardDuty Bucket<br/>Findings Storage]
+        
+        subgraph Protection [🛡️ Protection Strategy]
+            Protected[Protected Buckets<br/>prevent_destroy=true]
+            Unprotected[Unprotected Buckets<br/>prevent_destroy=false]
+        end
+    end
+    
+    %% IAM Layer
+    subgraph IAM [👤 IAM Layer]
+        ReadOnly[ReadOnlyAdmin Role]
+        PowerUser[PowerUserRestrictedIAM Role]
+        SecurityAuditor[SecurityAuditor Role]
+    end
+    
+    %% Monitoring Layer
+    subgraph Monitoring [📊 Monitoring Layer]
+        Budget[Budget Alerts]
+        SNS[SNS Notifications]
+        CloudWatch[CloudWatch Metrics]
+    end
+    
+    %% Connections
+    VPC --> IGW
+    VPC --> NAT
+    Public1 --> IGW
+    Public2 --> IGW
+    Private1 --> NAT
+    Private2 --> NAT
+    
+    CT --> CTBucket
+    GD --> GDBucket
+    AC --> SNS
+    SH --> CloudWatch
+    Budget --> SNS
+    
+    CTBucket --> Protection
+    GDBucket --> Protection
+    
+    %% Styling
+    classDef network fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    classDef security fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef storage fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
+    classDef iam fill:#FCE4EC,stroke:#C2185B,stroke-width:2px
+    classDef monitoring fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    
+    class VPC,IGW,NAT,Public1,Public2,Private1,Private2 network
+    class CT,AC,GD,SH,MC security
+    class CTBucket,GDBucket,Protected,Unprotected storage
+    class ReadOnly,PowerUser,SecurityAuditor iam
+    class Budget,SNS,CloudWatch monitoring
+```
+
 ## Architecture Components
 
 ### 1. Networking Layer
@@ -52,6 +208,34 @@ The Terraform AWS Secure Landing Zone provides a comprehensive foundation for AW
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### 4. Resource Protection Layer
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Resource Protection                     │
+├─────────────────────────────────────────────────────────────┤
+│  Configurable Protection   │  Dual-Bucket Approach        │
+│  • prevent_destroy = true │  • Protected Buckets         │
+│  • Production Safety      │  • Unprotected Buckets       │
+│  • Test Flexibility       │  • Conditional Creation       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Resource Protection Strategy:**
+- **Production Environment**: `prevent_destroy = true` (default)
+  - Protects critical resources from accidental deletion
+  - S3 buckets with `lifecycle.prevent_destroy = true`
+  - KMS keys with deletion protection
+- **Test Environment**: `prevent_destroy = false`
+  - Allows complete cleanup for testing
+  - Enables automated resource destruction
+  - Supports CI/CD pipeline testing
+- **Dual-Bucket Implementation**:
+  - Conditional resource creation using `count` parameter
+  - `*_protected` buckets with lifecycle protection
+  - `*_unprotected` buckets without protection
+  - Local references for consistent resource selection
+
 ### 4. Identity & Access Management
 
 ```
@@ -77,153 +261,3 @@ The Terraform AWS Secure Landing Zone provides a comprehensive foundation for AW
 │  • Forecast Monitoring     │  • Escalation Procedures     │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-## Data Flow
-
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   AWS API   │───▶│  CloudTrail │───▶│  S3 Bucket  │
-│   Calls     │    │   Logging   │    │   Storage   │
-└─────────────┘    └─────────────┘    └─────────────┘
-       │                   │                   │
-       ▼                   ▼                   ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ AWS Config  │    │  GuardDuty  │    │ Security Hub│
-│ Monitoring  │    │  Detection  │    │  Analysis   │
-└─────────────┘    └─────────────┘    └─────────────┘
-       │                   │                   │
-       ▼                   ▼                   ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Compliance  │    │  Macie      │    │  SNS        │
-│  Reports    │    │  Findings   │    │  Alerts     │
-└─────────────┘    └─────────────┘    └─────────────┘
-```
-
-## Security Controls
-
-### Network Security
-- **VPC Isolation**: All resources deployed within private VPC
-- **Subnet Segmentation**: Public and private subnets with proper routing
-- **NAT Gateway**: Controlled outbound access for private resources
-- **Security Groups**: Default deny, explicit allow policies
-
-### Data Security
-- **Encryption at Rest**: KMS encryption for all storage resources
-- **Encryption in Transit**: TLS 1.2+ for all communications
-- **S3 Block Public Access**: Prevents accidental public exposure
-- **Macie Data Classification**: Automated sensitive data detection
-
-### Access Control
-- **Least Privilege**: IAM roles with minimal required permissions
-- **Permission Boundaries**: Maximum permission limits
-- **Multi-Factor Authentication**: Required for administrative access
-- **Session Management**: Temporary credentials with expiration
-
-### Monitoring & Compliance
-- **Comprehensive Logging**: All API calls logged via CloudTrail
-- **Real-time Monitoring**: GuardDuty for threat detection
-- **Compliance Standards**: CIS, PCI DSS, SOC 2 support
-- **Automated Response**: Security Hub for centralized management
-
-## Compliance Framework
-
-### CIS AWS Foundations Benchmark
-- **Identity and Access Management**: IAM best practices
-- **Logging and Monitoring**: CloudTrail and CloudWatch
-- **Networking**: VPC and security group configuration
-- **Data Protection**: Encryption and access controls
-
-### PCI DSS
-- **Network Security**: Segmentation and monitoring
-- **Access Control**: Authentication and authorization
-- **Data Protection**: Encryption and classification
-- **Audit and Compliance**: Logging and reporting
-
-### SOC 2
-- **Security**: Comprehensive security controls
-- **Availability**: High availability architecture
-- **Processing Integrity**: Data validation and monitoring
-- **Confidentiality**: Data protection and access controls
-- **Privacy**: Data classification and handling
-
-## Scalability Considerations
-
-### Multi-Account Support
-- **AWS Organizations**: Centralized management
-- **Cross-Account Roles**: Federated access patterns
-- **Shared Services**: Centralized security and monitoring
-- **Account Vending**: Automated account provisioning
-
-### Multi-Region Deployment
-- **Regional Replication**: Cross-region backup and DR
-- **Global Services**: CloudFront and Route 53
-- **Regional Compliance**: Data residency requirements
-- **Cost Optimization**: Regional pricing differences
-
-### Performance Optimization
-- **Auto Scaling**: Dynamic resource allocation
-- **Load Balancing**: Traffic distribution
-- **Caching**: Performance acceleration
-- **CDN**: Global content delivery
-
-## Cost Optimization
-
-### Resource Optimization
-- **Right Sizing**: Appropriate instance types
-- **Reserved Instances**: Long-term cost savings
-- **Spot Instances**: Non-critical workload optimization
-- **Storage Tiering**: S3 lifecycle policies
-
-### Monitoring and Alerts
-- **Budget Thresholds**: Cost control mechanisms
-- **Anomaly Detection**: Unusual spending patterns
-- **Resource Tagging**: Cost allocation and tracking
-- **Automated Cleanup**: Unused resource removal
-
-## Disaster Recovery
-
-### Backup Strategy
-- **Automated Backups**: Regular snapshot creation
-- **Cross-Region Replication**: Geographic redundancy
-- **Point-in-Time Recovery**: Database restoration
-- **Configuration Backup**: Infrastructure state preservation
-
-### Recovery Procedures
-- **RTO/RPO Targets**: Recovery time and point objectives
-- **Automated Recovery**: Infrastructure as Code deployment
-- **Testing Procedures**: Regular DR testing
-- **Documentation**: Recovery runbooks and procedures
-
-## Operational Excellence
-
-### Monitoring and Alerting
-- **Centralized Logging**: CloudWatch and CloudTrail
-- **Real-time Alerts**: SNS and Lambda integration
-- **Dashboard Visualization**: CloudWatch dashboards
-- **Incident Response**: Automated and manual procedures
-
-### Change Management
-- **Infrastructure as Code**: Terraform for all resources
-- **Version Control**: Git-based change tracking
-- **Testing**: Automated validation and testing
-- **Rollback Procedures**: Quick recovery mechanisms
-
-## Future Enhancements
-
-### Advanced Security
-- **WAF Integration**: Web application firewall
-- **DDoS Protection**: Shield and Shield Advanced
-- **Certificate Management**: ACM automation
-- **Secrets Management**: AWS Secrets Manager
-
-### Machine Learning
-- **Anomaly Detection**: ML-based threat detection
-- **Predictive Analytics**: Cost and performance optimization
-- **Automated Response**: Self-healing infrastructure
-- **Intelligent Monitoring**: AI-powered insights
-
-### Integration Capabilities
-- **Third-party Tools**: SIEM and SOAR integration
-- **API Management**: RESTful API exposure
-- **Event Streaming**: Kinesis and SQS integration
-- **Custom Workflows**: Lambda and Step Functions 
