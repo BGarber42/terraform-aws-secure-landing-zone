@@ -59,4 +59,38 @@ testing-guide.md
 
 # Test artifacts
 test-results/
-coverage/ 
+coverage/
+
+# Python cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python scripts used for git history manipulation
+replace_org.py
+org_rewrite.py 
