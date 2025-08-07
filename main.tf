@@ -50,9 +50,18 @@ resource "aws_kms_key" "s3_encryption" {
         }
         Action = [
           "kms:Decrypt",
-          "kms:GenerateDataKey"
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
         ]
         Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.account_id
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:guardduty:${var.region}:${var.account_id}:detector/*"
+          }
+        }
       },
       {
         Sid    = "Allow Config to use the key"
@@ -62,7 +71,8 @@ resource "aws_kms_key" "s3_encryption" {
         }
         Action = [
           "kms:Decrypt",
-          "kms:GenerateDataKey"
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
         ]
         Resource = "*"
       }
@@ -169,6 +179,7 @@ module "cloudtrail" {
   cloudtrail_bucket_name = var.cloudtrail_bucket_name
   cloudtrail_enable_kms  = var.cloudtrail_enable_kms
   s3_encryption_key_arn  = aws_kms_key.s3_encryption.arn
+  prevent_destroy        = var.prevent_destroy
   tags                   = var.tags
 }
 
@@ -203,6 +214,7 @@ module "guardduty" {
   enable_guardduty               = var.enable_guardduty
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
   s3_encryption_key_arn          = aws_kms_key.s3_encryption.arn
+  prevent_destroy                = var.prevent_destroy
   tags                           = var.tags
 }
 

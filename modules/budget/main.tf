@@ -50,44 +50,59 @@ resource "aws_budgets_budget" "cost" {
   limit_amount = var.budget_limit_usd
   limit_unit   = "USD"
 
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 80
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.budget_alert_subscribers
+  dynamic "notification" {
+    for_each = length(var.budget_alert_subscribers) > 0 ? [1] : []
+    content {
+      comparison_operator        = "GREATER_THAN"
+      threshold                  = 80
+      threshold_type             = "PERCENTAGE"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = var.budget_alert_subscribers
+    }
   }
 
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 100
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.budget_alert_subscribers
+  dynamic "notification" {
+    for_each = length(var.budget_alert_subscribers) > 0 ? [1] : []
+    content {
+      comparison_operator        = "GREATER_THAN"
+      threshold                  = 100
+      threshold_type             = "PERCENTAGE"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = var.budget_alert_subscribers
+    }
   }
 
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 120
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.budget_alert_subscribers
+  dynamic "notification" {
+    for_each = length(var.budget_alert_subscribers) > 0 ? [1] : []
+    content {
+      comparison_operator        = "GREATER_THAN"
+      threshold                  = 120
+      threshold_type             = "PERCENTAGE"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = var.budget_alert_subscribers
+    }
   }
 
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 150
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.budget_alert_subscribers
+  dynamic "notification" {
+    for_each = length(var.budget_alert_subscribers) > 0 ? [1] : []
+    content {
+      comparison_operator        = "GREATER_THAN"
+      threshold                  = 150
+      threshold_type             = "PERCENTAGE"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = var.budget_alert_subscribers
+    }
   }
 
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 200
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = var.budget_alert_subscribers
+  dynamic "notification" {
+    for_each = length(var.budget_alert_subscribers) > 0 ? [1] : []
+    content {
+      comparison_operator        = "GREATER_THAN"
+      threshold                  = 200
+      threshold_type             = "PERCENTAGE"
+      notification_type          = "ACTUAL"
+      subscriber_email_addresses = var.budget_alert_subscribers
+    }
   }
 
   tags = merge(var.tags, {

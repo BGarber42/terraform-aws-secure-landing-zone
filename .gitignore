@@ -61,16 +61,13 @@ testing-guide.md
 *.temp
 .secrets
 
-# Branch protection scripts (not committed to git)
-scripts/*-branch-protection.ps1
-scripts/*-branch-protection.sh
-
-# Release scripts (run locally, not committed)
-scripts/release.ps1
+# Scripts directory (contains local deployment and cleanup scripts)
+scripts/
 
 # Test artifacts
 test-results/
 coverage/
+test-deployment-test/
 
 # Python cache and temporary files
 __pycache__/

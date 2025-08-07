@@ -25,6 +25,9 @@ module "landing_zone" {
   account_id = "123456789012"
   region     = "us-east-1"
   
+  # Set to false for testing environments
+  prevent_destroy = false
+  
   cloudtrail_bucket_name = "my-org-cloudtrail-logs"
   
   tags = {
@@ -33,6 +36,65 @@ module "landing_zone" {
   }
 }
 ```
+
+## Important Notes
+
+### Resources with `prevent_destroy` Protection
+
+Some resources in this module have `lifecycle.prevent_destroy` enabled by default to prevent accidental deletion of critical infrastructure:
+
+- **S3 Buckets**: CloudTrail and GuardDuty S3 buckets are protected from accidental deletion
+- **KMS Keys**: Encryption keys are protected to prevent data loss
+
+#### Configurable Protection
+
+The `prevent_destroy` variable allows you to control this protection:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  # Set to false for testing environments
+  prevent_destroy = false
+  
+  cloudtrail_bucket_name = "my-org-cloudtrail-logs"
+  
+  tags = {
+    Environment = "production"
+    Owner       = "platform-team"
+  }
+}
+```
+
+- **Production**: `prevent_destroy = true` (default) - Protects critical resources
+- **Testing**: `prevent_destroy = false` - Allows complete cleanup for testing
+
+#### Manual Cleanup (when prevent_destroy = true)
+
+When `prevent_destroy = true`, these protected resources must be manually deleted:
+
+```bash
+# After running terraform destroy, manually delete S3 buckets:
+aws s3 rb s3://your-cloudtrail-bucket-name --force
+aws s3 rb s3://your-guardduty-bucket-name --force
+```
+
+#### Test Deployment
+
+For test deployments with `prevent_destroy = false`, you can use standard Terraform commands:
+
+```bash
+# Deploy test infrastructure
+terraform apply
+
+# Clean up test infrastructure
+terraform destroy
+```
+
+This approach allows complete cleanup including protected resources when `prevent_destroy = false`.
 
 ## Features
 

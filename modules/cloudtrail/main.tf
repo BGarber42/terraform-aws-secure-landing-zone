@@ -1,19 +1,37 @@
-# S3 Bucket for CloudTrail logs
-resource "aws_s3_bucket" "cloudtrail" {
+# S3 Bucket for CloudTrail logs (with prevent_destroy)
+resource "aws_s3_bucket" "cloudtrail_protected" {
+  count = var.prevent_destroy ? 1 : 0
+
   bucket = var.cloudtrail_bucket_name
 
   tags = merge(var.tags, {
     Name = "cloudtrail-logs-bucket"
   })
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+}
+
+# S3 Bucket for CloudTrail logs (without prevent_destroy)
+resource "aws_s3_bucket" "cloudtrail_unprotected" {
+  count = var.prevent_destroy ? 0 : 1
+
+  bucket = var.cloudtrail_bucket_name
+
+  tags = merge(var.tags, {
+    Name = "cloudtrail-logs-bucket"
+  })
+}
+
+# Use the appropriate bucket based on prevent_destroy setting
+locals {
+  cloudtrail_bucket = var.prevent_destroy ? aws_s3_bucket.cloudtrail_protected[0] : aws_s3_bucket.cloudtrail_unprotected[0]
 }
 
 # S3 Bucket versioning
 resource "aws_s3_bucket_versioning" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
+  bucket = local.cloudtrail_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -21,7 +39,7 @@ resource "aws_s3_bucket_versioning" "cloudtrail" {
 
 # S3 Bucket server-side encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
+  bucket = local.cloudtrail_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -33,7 +51,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
 
 # S3 Bucket public access block
 resource "aws_s3_bucket_public_access_block" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
+  bucket = local.cloudtrail_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -43,7 +61,7 @@ resource "aws_s3_bucket_public_access_block" "cloudtrail" {
 
 # S3 Bucket lifecycle configuration
 resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
+  bucket = local.cloudtrail_bucket.id
 
   rule {
     id     = "cloudtrail-lifecycle"
@@ -65,7 +83,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
 
 # S3 Bucket policy
 resource "aws_s3_bucket_policy" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
+  bucket = local.cloudtrail_bucket.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -76,7 +94,7 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
           Service = "cloudtrail.amazonaws.com"
         }
         Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.cloudtrail.arn
+        Resource = local.cloudtrail_bucket.arn
       },
       {
         Sid    = "AWSCloudTrailWrite"
@@ -85,7 +103,39 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
           Service = "cloudtrail.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudtrail.arn}/*"
+        Resource = "${local.cloudtrail_bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      },
+      {
+        Sid    = "AWSConfigAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "config.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = local.cloudtrail_bucket.arn
+      },
+      {
+        Sid    = "AWSConfigLocation"
+        Effect = "Allow"
+        Principal = {
+          Service = "config.amazonaws.com"
+        }
+        Action   = "s3:GetBucketLocation"
+        Resource = local.cloudtrail_bucket.arn
+      },
+      {
+        Sid    = "AWSConfigWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "config.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${local.cloudtrail_bucket.arn}/*"
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
@@ -99,7 +149,7 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
 # CloudTrail
 resource "aws_cloudtrail" "main" {
   name                          = "landing-zone-cloudtrail"
-  s3_bucket_name                = aws_s3_bucket.cloudtrail.bucket
+  s3_bucket_name                = local.cloudtrail_bucket.bucket
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_logging                = true

@@ -1,108 +1,196 @@
-# Local Testing with Act
+# Local Testing Guide
 
-This document explains how to run GitHub Actions locally using [act](https://github.com/nektos/act).
+This guide helps you test the Terraform AWS Landing Zone module locally.
 
 ## Prerequisites
 
-1. Install `act`:
+- AWS CLI configured with appropriate permissions
+- Terraform >= 1.12.2
+- PowerShell (for Windows) or Bash shell (for Linux/Mac)
+
+## Quick Test Setup
+
+1. **Create a test deployment directory:**
    ```bash
-   # macOS
-   brew install act
-   
-   # Linux
-   curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-   
-   # Windows
-   choco install act-cli
+   mkdir test-deployment-test
+   cd test-deployment-test
    ```
 
-2. Install Docker (required by act)
+2. **Create main.tf that references the module:**
+   ```hcl
+   terraform {
+     required_version = ">= 1.12.2"
+     
+     required_providers {
+       aws = {
+         source  = "hashicorp/aws"
+         version = ">= 5.0.0"
+       }
+     }
+   }
 
-## Setup
+   provider "aws" {
+     region = "us-east-1"
+   }
 
-1. **Create a `.secrets` file** in the project root:
-   ```bash
-   # Copy the example and update with your values
-   cp .secrets.example .secrets
+   module "landing_zone" {
+     source = "../"
+
+     account_id = "YOUR_ACCOUNT_ID"
+     region     = "us-east-1"
+     
+     cloudtrail_bucket_name = "test-landing-zone-cloudtrail-YOUR_ACCOUNT_ID"
+     guardduty_findings_bucket_name = "test-landing-zone-guardduty-YOUR_ACCOUNT_ID"
+     
+     # Set prevent_destroy to false for test deployments
+     prevent_destroy = false
+     
+     tags = {
+       Environment = "test"
+       Owner       = "test-deployment"
+       Purpose     = "module-validation"
+     }
+   }
+
+   output "vpc_id" {
+     description = "The ID of the VPC"
+     value       = module.landing_zone.vpc_id
+   }
+
+   output "cloudtrail_bucket_arn" {
+     description = "ARN of the CloudTrail S3 bucket"
+     value       = module.landing_zone.cloudtrail_bucket_arn
+   }
    ```
 
-2. **Update the `.secrets` file** with your actual AWS credentials:
+3. **Deploy the test infrastructure:**
    ```bash
-   AWS_ACCESS_KEY_ID=your-actual-access-key
-   AWS_SECRET_ACCESS_KEY=your-actual-secret-key
-   AWS_ACCOUNT_ID=your-actual-account-id
+   terraform init
+   terraform plan
+   terraform apply
    ```
 
-## Running Tests
+4. **Clean up after testing:**
+   ```bash
+   terraform destroy
+   ```
 
-### Run all jobs
-```bash
-act --secret-file .secrets -W .github/workflows/ci.yml
+## Important: Resources with `prevent_destroy` Protection
+
+Some resources in this module have `lifecycle.prevent_destroy` enabled by default to prevent accidental deletion:
+
+### Protected Resources
+- **S3 Buckets**: CloudTrail and GuardDuty buckets are protected
+- **KMS Keys**: Encryption keys are protected
+
+### Configurable Protection
+
+The `prevent_destroy` variable allows you to control this protection:
+
+- **Production**: `prevent_destroy = true` (default) - Protects critical resources
+- **Testing**: `prevent_destroy = false` - Allows complete cleanup for testing
+
+### Test Configuration
+
+For test deployments, ensure your `main.tf` includes:
+
+```hcl
+module "landing_zone" {
+  # ... other configuration ...
+  
+  # Set prevent_destroy to false for test deployments
+  prevent_destroy = false
+  
+  # ... other configuration ...
+}
 ```
 
-### Run specific jobs
+### Manual Cleanup (when prevent_destroy = true)
+
+When `prevent_destroy = true`, these protected resources must be manually deleted:
+
 ```bash
-# Run only validation
-act --secret-file .secrets -W .github/workflows/ci.yml validate
-
-# Run only tests
-act --secret-file .secrets -W .github/workflows/ci.yml test
-
-# Run only format and lint
-act --secret-file .secrets -W .github/workflows/ci.yml fmt-lint
+# After terraform destroy, manually delete S3 buckets:
+aws s3 rb s3://test-cloudtrail-logs-1234567890 --force
+aws s3 rb s3://test-guardduty-findings-1234567890 --force
 ```
 
-### Run with specific matrix values
-```bash
-# Test specific example
-act --secret-file .secrets -W .github/workflows/ci.yml validate -e <(echo '{"matrix":{"example":"basic"}}')
+### Automated Cleanup
 
-# Test specific test type
-act --secret-file .secrets -W .github/workflows/ci.yml test -e <(echo '{"matrix":{"test":"basic"}}')
+For test deployments with `prevent_destroy = false`, you can use standard Terraform commands:
+
+```bash
+# Deploy test infrastructure
+terraform apply
+
+# Clean up test infrastructure
+terraform destroy
 ```
+
+This approach allows complete cleanup including protected resources when `prevent_destroy = false`.
+
+## Test Configuration
+
+The test deployment uses the following configuration:
+
+- **Account ID**: Your AWS account ID
+- **Region**: us-east-1
+- **VPC CIDR**: 10.0.0.0/16
+- **Subnets**: 2 public, 2 private across 2 AZs
+- **Security Services**: CloudTrail, Config, GuardDuty, Budget alerts
+- **IAM Roles**: ReadOnlyAdmin, PowerUserRestrictedIAM
+- **prevent_destroy**: false (for testing)
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Docker not running**: Make sure Docker is running on your system
-2. **Permission issues**: On Linux/macOS, you might need to run with `sudo`
-3. **Memory issues**: Increase Docker memory allocation if tests fail due to memory constraints
+1. **AWS CLI not configured:**
+   ```bash
+   aws configure
+   ```
 
-### Debug Mode
+2. **Insufficient permissions:**
+   - Ensure your AWS user/role has the necessary permissions
+   - Check IAM policies for required actions
 
-Run with verbose output to see what's happening:
-```bash
-act --secret-file .secrets -W .github/workflows/ci.yml --verbose
-```
+3. **S3 bucket already exists:**
+   - Use unique bucket names in your configuration
+   - Or manually delete existing buckets first
 
-### Clean Up
+4. **KMS key creation fails:**
+   - Check KMS service quotas
+   - Ensure proper IAM permissions for KMS
 
-Remove act containers and images:
-```bash
-docker system prune -f
-```
+### Cleanup Issues
 
-## Environment Variables
+If `terraform destroy` fails due to protected resources:
 
-The following environment variables are automatically set by the workflow:
+1. **Check prevent_destroy setting:**
+   ```bash
+   # Ensure your main.tf has:
+   prevent_destroy = false
+   ```
 
-- `AWS_DEFAULT_REGION=us-east-1`
-- `TF_LOG=INFO`
+2. **Manual cleanup:**
+   ```bash
+   # Delete S3 buckets manually
+   aws s3 rb s3://bucket-name --force
+   
+   # Delete KMS keys manually (if needed)
+   aws kms schedule-key-deletion --key-id key-id --pending-window-in-days 7
+   ```
 
-## Secrets Required
+## Security Considerations
 
-The following secrets must be set in your `.secrets` file:
+- Test deployments use predictable resource names
+- S3 buckets contain test data only
+- KMS keys are created with 7-day deletion window
+- All resources are tagged for easy identification
 
-| Secret | Description | Example |
-|--------|-------------|---------|
-| `AWS_ACCESS_KEY_ID` | AWS access key | `AKIA...` |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key | `wJalr...` |
-| `AWS_ACCOUNT_ID` | AWS account ID | `123456789012` |
+## Cost Optimization
 
-## Notes
-
-- The `.secrets` file is already in `.gitignore` to prevent accidental commits
-- All examples now have sensible defaults, so no additional variables need to be set
-- Tests will create actual AWS resources, so ensure you're using a test account
-- Resources are automatically cleaned up by the Terratest framework
+- Test deployments use minimal configurations
+- Budget alerts are set to $100 USD
+- Resources are designed for quick cleanup
+- Consider using AWS Organizations for isolated testing

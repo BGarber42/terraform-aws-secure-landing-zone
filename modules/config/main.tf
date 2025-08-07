@@ -43,18 +43,26 @@ resource "aws_iam_role_policy" "config" {
       {
         Effect = "Allow"
         Action = [
-          "s3:GetBucketAcl",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:PutObjectAcl"
         ]
         Resource = [
-          "arn:aws:s3:::${var.config_bucket_name}",
           "arn:aws:s3:::${var.config_bucket_name}/*"
         ]
         Condition = {
-          StringEquals = {
+          StringLike = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
           }
         }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketAcl"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.config_bucket_name}"
+        ]
       },
       {
         Effect = "Allow"
@@ -97,6 +105,8 @@ resource "aws_config_configuration_recorder_status" "main" {
 # AWS Config Rules
 resource "aws_config_config_rule" "managed_rules" {
   for_each = var.config_rules
+
+  depends_on = [aws_config_configuration_recorder_status.main]
 
   name        = each.key
   description = "AWS Config managed rule: ${each.value}"
