@@ -35,4 +35,9 @@ variable "guardduty_kms_key_arn" {
   description = "KMS key ARN for GuardDuty publishing destination"
   type        = string
   default     = ""
+}
+
+variable "s3_encryption_key_arn" {
+  description = "ARN of the KMS key for S3 encryption"
+  type        = string
 } 

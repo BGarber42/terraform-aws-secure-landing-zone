@@ -18,12 +18,4 @@ output "cloudtrail_name" {
   value       = aws_cloudtrail.main.name
 }
 
-output "kms_key_arn" {
-  description = "ARN of the KMS key used for CloudTrail encryption (if enabled)"
-  value       = var.cloudtrail_enable_kms ? aws_kms_key.s3_encryption[0].arn : null
-}
-
-output "kms_key_id" {
-  description = "ID of the KMS key used for CloudTrail encryption (if enabled)"
-  value       = var.cloudtrail_enable_kms ? aws_kms_key.s3_encryption[0].id : null
-} 
+ 

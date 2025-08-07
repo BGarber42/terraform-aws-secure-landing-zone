@@ -29,4 +29,9 @@ variable "cloudtrail_enable_kms" {
   description = "Enable KMS encryption for CloudTrail"
   type        = bool
   default     = true
+}
+
+variable "s3_encryption_key_arn" {
+  description = "ARN of the KMS key for S3 encryption"
+  type        = string
 } 

@@ -12,74 +12,8 @@ provider "aws" {
   region = var.region
 }
 
-# KMS Key for S3 bucket encryption (shared across CloudTrail, GuardDuty, Config)
-resource "aws_kms_key" "s3_encryption" {
-  count                   = var.cloudtrail_enable_kms ? 1 : 0
-  description             = "KMS key for S3 bucket encryption"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "Enable IAM User Permissions"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${var.account_id}:root"
-        }
-        Action   = "kms:*"
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow CloudTrail to use the key"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow GuardDuty to use the key"
-        Effect = "Allow"
-        Principal = {
-          Service = "guardduty.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow Config to use the key"
-        Effect = "Allow"
-        Principal = {
-          Service = "config.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-
-  tags = merge(var.tags, {
-    Name = "s3-encryption-key"
-  })
-}
-
-resource "aws_kms_alias" "s3_encryption" {
-  count         = var.cloudtrail_enable_kms ? 1 : 0
-  name          = "alias/s3-encryption"
-  target_key_id = aws_kms_key.s3_encryption[0].id
-}
+# Note: Using shared S3 encryption key passed from root module
+# This ensures proper dependency management
 
 # S3 Bucket for CloudTrail logs
 resource "aws_s3_bucket" "cloudtrail" {
@@ -108,7 +42,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.s3_encryption[0].arn
+      kms_master_key_id = var.s3_encryption_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
@@ -188,7 +122,7 @@ resource "aws_cloudtrail" "main" {
   enable_logging                = true
   enable_log_file_validation    = true
 
-  kms_key_id = var.cloudtrail_enable_kms ? aws_kms_key.s3_encryption[0].arn : null
+  kms_key_id = var.cloudtrail_enable_kms ? var.s3_encryption_key_arn : null
 
   event_selector {
     read_write_type                  = "All"
