@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
+## [0.4.3] - 2024-12-19
+
+### Added
+- **OpenTofu compatibility** with full feature support
+- **Version requirements optimization** from >= 1.12.2 to >= 1.5.0 for broader compatibility
+- **OpenTofu usage documentation** with command examples
+- **Comprehensive testing** of all examples with OpenTofu v1.10.5
+
+### Changed
+- **Version constraints** updated across all examples and root module
+- **README documentation** enhanced with OpenTofu compatibility notes
+- **Provider compatibility** verified with OpenTofu registry
+
+### Technical Details
+- **OpenTofu Testing**: All examples (basic, full, advanced) tested successfully
+- **Feature Compatibility**: All advanced features work with OpenTofu including:
+  - Macie custom data identifiers
+  - Security Hub action targets and insights
+  - Complex validation blocks
+  - Dynamic blocks and for_each loops
+- **Provider Integration**: OpenTofu automatically updates provider registry references
+- **Performance**: OpenTofu often provides faster execution for large configurations
+
 ## [0.4.1] - 2024-12-19
 
 ### Added
