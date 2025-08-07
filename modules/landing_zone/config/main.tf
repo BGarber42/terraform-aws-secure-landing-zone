@@ -75,9 +75,9 @@ resource "aws_config_configuration_recorder" "main" {
   role_arn = aws_iam_role.config.arn
 
   recording_group {
-    all_supported                 = true
-    include_global_resources      = true
-    exclude_resource_types        = ["AWS::CloudTrail::Trail"]
+    all_supported            = true
+    include_global_resources = true
+    exclude_resource_types   = ["AWS::CloudTrail::Trail"]
   }
 }
 
@@ -92,12 +92,12 @@ resource "aws_config_delivery_channel" "main" {
 
 # AWS Config Configuration Recorder Status
 resource "aws_config_configuration_recorder_status" "main" {
-  name       = aws_config_configuration_recorder.main.name
+  name         = aws_config_configuration_recorder.main.name
   is_recording = true
   recording_group {
-    all_supported                 = true
-    include_global_resources      = true
-    exclude_resource_types        = ["AWS::CloudTrail::Trail"]
+    all_supported            = true
+    include_global_resources = true
+    exclude_resource_types   = ["AWS::CloudTrail::Trail"]
   }
 
   depends_on = [aws_config_delivery_channel.main]

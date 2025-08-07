@@ -66,13 +66,13 @@ module "landing_zone" {
   ]
 
   # GuardDuty Configuration
-  enable_guardduty              = true
+  enable_guardduty               = true
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
 
   # Budget Configuration
   enable_budget_alerts     = true
   enable_budget_actions    = false
-  budget_limit_usd        = var.budget_limit_usd
+  budget_limit_usd         = var.budget_limit_usd
   budget_alert_subscribers = var.budget_alert_subscribers
 
   # Security Hub Configuration
@@ -82,20 +82,20 @@ module "landing_zone" {
   enable_action_targets = true
 
   # Macie Configuration
-  enable_macie                     = true
+  enable_macie                       = true
   macie_finding_publishing_frequency = "FIFTEEN_MINUTES"
-  enable_macie_s3_classification   = true
-  s3_buckets_to_scan              = var.macie_s3_buckets_to_scan
-  excluded_file_extensions         = ["jpg", "jpeg", "png", "gif", "mp4", "avi", "mov", "pdf"]
+  enable_macie_s3_classification     = true
+  s3_buckets_to_scan                 = var.macie_s3_buckets_to_scan
+  excluded_file_extensions           = ["jpg", "jpeg", "png", "gif", "mp4", "avi", "mov", "pdf"]
   custom_data_identifiers = {
     "credit_card_pattern" = {
-      description   = "Credit card number pattern"
+      description  = "Credit card number pattern"
       regex        = "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
       keywords     = ["credit", "card", "payment"]
       ignore_words = ["test", "example", "sample"]
     },
     "ssn_pattern" = {
-      description   = "Social Security Number pattern"
+      description  = "Social Security Number pattern"
       regex        = "\\b\\d{3}-\\d{2}-\\d{4}\\b"
       keywords     = ["ssn", "social", "security"]
       ignore_words = ["test", "example"]

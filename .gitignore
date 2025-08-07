@@ -90,7 +90,3 @@ env/
 ENV/
 env.bak/
 venv.bak/
-
-# Python scripts used for git history manipulation
-replace_org.py
-org_rewrite.py 

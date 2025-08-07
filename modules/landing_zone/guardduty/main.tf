@@ -126,7 +126,7 @@ resource "aws_s3_bucket_policy" "guardduty_findings" {
 resource "aws_guardduty_publishing_destination" "main" {
   count = var.enable_guardduty ? 1 : 0
 
-  detector_id     = aws_guardduty_detector.main[0].id
+  detector_id      = aws_guardduty_detector.main[0].id
   destination_type = "S3"
   destination_arn  = aws_s3_bucket.guardduty_findings[0].arn
 

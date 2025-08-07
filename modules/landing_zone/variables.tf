@@ -55,11 +55,11 @@ variable "config_rules" {
   description = "Map of AWS Config rule names to rule configurations"
   type        = map(string)
   default = {
-    "s3-bucket-public-read-prohibited" = "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+    "s3-bucket-public-read-prohibited"  = "S3_BUCKET_PUBLIC_READ_PROHIBITED"
     "s3-bucket-public-write-prohibited" = "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
-    "s3-bucket-ssl-requests-only" = "S3_BUCKET_SSL_REQUESTS_ONLY"
-    "s3-bucket-versioning-enabled" = "S3_BUCKET_VERSIONING_ENABLED"
-    "s3-bucket-logging-enabled" = "S3_BUCKET_LOGGING_ENABLED"
+    "s3-bucket-ssl-requests-only"       = "S3_BUCKET_SSL_REQUESTS_ONLY"
+    "s3-bucket-versioning-enabled"      = "S3_BUCKET_VERSIONING_ENABLED"
+    "s3-bucket-logging-enabled"         = "S3_BUCKET_LOGGING_ENABLED"
   }
 }
 
@@ -161,7 +161,7 @@ variable "macie_finding_publishing_frequency" {
   description = "Frequency for publishing Macie findings"
   type        = string
   default     = "FIFTEEN_MINUTES"
-  
+
   validation {
     condition     = contains(["FIFTEEN_MINUTES", "ONE_HOUR", "SIX_HOURS"], var.macie_finding_publishing_frequency)
     error_message = "Finding publishing frequency must be one of: FIFTEEN_MINUTES, ONE_HOUR, SIX_HOURS."
@@ -189,7 +189,7 @@ variable "macie_excluded_file_extensions" {
 variable "macie_custom_data_identifiers" {
   description = "Map of custom data identifiers for Macie"
   type = map(object({
-    description   = string
+    description  = string
     regex        = string
     keywords     = list(string)
     ignore_words = list(string)

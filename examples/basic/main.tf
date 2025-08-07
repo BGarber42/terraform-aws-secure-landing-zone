@@ -17,10 +17,10 @@ provider "aws" {
 module "landing_zone" {
   source = "../../modules/landing_zone"
 
-  account_id              = var.account_id
-  region                  = var.region
-  cloudtrail_bucket_name  = var.cloudtrail_bucket_name
-  tags                    = var.tags
+  account_id             = var.account_id
+  region                 = var.region
+  cloudtrail_bucket_name = var.cloudtrail_bucket_name
+  tags                   = var.tags
 }
 
 # Outputs from the landing zone module

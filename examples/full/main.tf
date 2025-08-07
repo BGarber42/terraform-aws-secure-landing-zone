@@ -36,14 +36,14 @@ module "landing_zone" {
   iam_roles = var.iam_roles
 
   # GuardDuty Configuration
-  enable_guardduty              = var.enable_guardduty
+  enable_guardduty               = var.enable_guardduty
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
 
   # Budget Configuration
-  enable_budget_alerts       = var.enable_budget_alerts
-  enable_budget_actions      = var.enable_budget_actions
-  budget_limit_usd           = var.budget_limit_usd
-  budget_alert_subscribers   = var.budget_alert_subscribers
+  enable_budget_alerts     = var.enable_budget_alerts
+  enable_budget_actions    = var.enable_budget_actions
+  budget_limit_usd         = var.budget_limit_usd
+  budget_alert_subscribers = var.budget_alert_subscribers
 
   # Tags
   tags = var.tags

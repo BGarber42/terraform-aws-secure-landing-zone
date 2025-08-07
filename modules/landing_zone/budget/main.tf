@@ -57,49 +57,49 @@ resource "aws_sns_topic_subscription" "budget" {
 resource "aws_budgets_budget" "cost" {
   count = var.enable_budget_alerts ? 1 : 0
 
-  name              = "landing-zone-cost-budget"
-  budget_type       = "COST"
-  time_unit         = "MONTHLY"
-  limit_amount      = var.budget_limit_usd
-  limit_unit        = "USD"
+  name         = "landing-zone-cost-budget"
+  budget_type  = "COST"
+  time_unit    = "MONTHLY"
+  limit_amount = var.budget_limit_usd
+  limit_unit   = "USD"
 
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 80
-    threshold_type            = "PERCENTAGE"
-    notification_type         = "ACTUAL"
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = var.budget_alert_subscribers
   }
 
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 100
-    threshold_type            = "PERCENTAGE"
-    notification_type         = "ACTUAL"
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = var.budget_alert_subscribers
   }
 
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 120
-    threshold_type            = "PERCENTAGE"
-    notification_type         = "ACTUAL"
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = var.budget_alert_subscribers
   }
 
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 150
-    threshold_type            = "PERCENTAGE"
-    notification_type         = "ACTUAL"
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = var.budget_alert_subscribers
   }
 
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 200
-    threshold_type            = "PERCENTAGE"
-    notification_type         = "ACTUAL"
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
     subscriber_email_addresses = var.budget_alert_subscribers
   }
 
@@ -129,7 +129,7 @@ resource "aws_budgets_budget_action" "cost_control" {
   }
 
   subscribers {
-    address = var.budget_alert_subscribers[0]
+    address           = var.budget_alert_subscribers[0]
     subscription_type = "EMAIL"
   }
 }

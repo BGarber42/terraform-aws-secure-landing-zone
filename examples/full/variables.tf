@@ -56,14 +56,14 @@ variable "config_rules" {
   description = "Map of AWS Config rule names to rule configurations"
   type        = map(string)
   default = {
-    "s3-bucket-public-read-prohibited" = "S3_BUCKET_PUBLIC_READ_PROHIBITED"
-    "s3-bucket-public-write-prohibited" = "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
-    "s3-bucket-ssl-requests-only" = "S3_BUCKET_SSL_REQUESTS_ONLY"
-    "s3-bucket-versioning-enabled" = "S3_BUCKET_VERSIONING_ENABLED"
-    "s3-bucket-logging-enabled" = "S3_BUCKET_LOGGING_ENABLED"
+    "s3-bucket-public-read-prohibited"        = "S3_BUCKET_PUBLIC_READ_PROHIBITED"
+    "s3-bucket-public-write-prohibited"       = "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
+    "s3-bucket-ssl-requests-only"             = "S3_BUCKET_SSL_REQUESTS_ONLY"
+    "s3-bucket-versioning-enabled"            = "S3_BUCKET_VERSIONING_ENABLED"
+    "s3-bucket-logging-enabled"               = "S3_BUCKET_LOGGING_ENABLED"
     "ec2-instance-managed-by-systems-manager" = "EC2_INSTANCE_MANAGED_BY_SSM"
-    "ec2-instances-in-vpc" = "EC2_INSTANCES_IN_VPC"
-    "rds-instance-public-access-check" = "RDS_INSTANCE_PUBLIC_ACCESS_CHECK"
+    "ec2-instances-in-vpc"                    = "EC2_INSTANCES_IN_VPC"
+    "rds-instance-public-access-check"        = "RDS_INSTANCE_PUBLIC_ACCESS_CHECK"
   }
 }
 

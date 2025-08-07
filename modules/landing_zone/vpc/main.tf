@@ -67,7 +67,7 @@ resource "aws_internet_gateway" "main" {
 
 # Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
-  domain = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.main]
 
   tags = merge(var.tags, {
