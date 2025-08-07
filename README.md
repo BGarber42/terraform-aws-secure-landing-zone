@@ -28,6 +28,11 @@ module "landing_zone" {
   # Set to false for testing environments
   prevent_destroy = false
   
+  # VPC Configuration (CIDRs calculated automatically)
+  vpc_cidr             = "10.0.0.0/16"
+  public_subnet_count  = 2  # Creates 10.0.1.0/24, 10.0.2.0/24
+  private_subnet_count = 2  # Creates 10.0.3.0/24, 10.0.4.0/24
+  
   cloudtrail_bucket_name = "my-org-cloudtrail-logs"
   
   tags = {
@@ -239,6 +244,34 @@ module "landing_zone" {
   budget_alert_subscribers = ["admin@example.com", "finance@example.com"]
 }
 ```
+
+### Dynamic CIDR Calculation
+
+The module automatically calculates subnet CIDRs using Terraform's `cidrsubnet` function:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  # VPC Configuration with automatic CIDR calculation
+  vpc_cidr             = "10.0.0.0/16"
+  public_subnet_count  = 3  # Creates 10.0.1.0/24, 10.0.2.0/24, 10.0.3.0/24
+  private_subnet_count = 3  # Creates 10.0.4.0/24, 10.0.5.0/24, 10.0.6.0/24
+  
+  # Optional: Override with custom CIDRs
+  # public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+  # private_subnet_cidrs = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+```
+
+**Benefits:**
+- **Automatic Calculation**: No need to manually calculate CIDR blocks
+- **Flexible Scaling**: Easily add more subnets without CIDR conflicts
+- **Validation**: Built-in validation prevents overlapping CIDRs
+- **Backward Compatible**: Still supports custom CIDR specification
 
 ### Resource Protection with `prevent_destroy`
 

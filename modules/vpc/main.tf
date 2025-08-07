@@ -3,6 +3,45 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Dynamic CIDR calculation
+locals {
+  # Calculate subnet mask based on VPC CIDR
+  vpc_cidr_bits = tonumber(split("/", var.vpc_cidr)[1])
+
+  # Calculate subnet size (default /24 for subnets)
+  subnet_bits = 8 # /24 = 256 IPs per subnet
+
+  # Use provided CIDRs or calculate dynamically
+  public_subnet_cidrs = length(var.public_subnet_cidrs) > 0 ? var.public_subnet_cidrs : [
+    for i in range(var.public_subnet_count) :
+    cidrsubnet(var.vpc_cidr, local.subnet_bits, i)
+  ]
+
+  private_subnet_cidrs = length(var.private_subnet_cidrs) > 0 ? var.private_subnet_cidrs : [
+    for i in range(var.private_subnet_count) :
+    cidrsubnet(var.vpc_cidr, local.subnet_bits, var.public_subnet_count + i)
+  ]
+
+  # Validate that we don't exceed VPC capacity
+  total_subnets = var.public_subnet_count + var.private_subnet_count
+  max_subnets   = pow(2, 32 - local.vpc_cidr_bits - local.subnet_bits)
+}
+
+# Validation to ensure we don't exceed VPC capacity
+resource "terraform_data" "cidr_validation" {
+  input = {
+    # This will fail if the condition is false
+    valid = local.total_subnets <= local.max_subnets ? "true" : "false"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = local.total_subnets <= local.max_subnets
+      error_message = "Total subnet count (${local.total_subnets}) exceeds VPC capacity (${local.max_subnets}) for CIDR ${var.vpc_cidr} with /${local.subnet_bits + local.vpc_cidr_bits} subnets."
+    }
+  }
+}
+
 # VPC
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
@@ -16,9 +55,9 @@ resource "aws_vpc" "main" {
 
 # Public subnets
 resource "aws_subnet" "public" {
-  count             = length(var.public_subnet_cidrs)
+  count             = length(local.public_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.public_subnet_cidrs[count.index]
+  cidr_block        = local.public_subnet_cidrs[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   map_public_ip_on_launch = var.map_public_ip_on_launch
@@ -31,9 +70,9 @@ resource "aws_subnet" "public" {
 
 # Private subnets
 resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidrs)
+  count             = length(local.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
+  cidr_block        = local.private_subnet_cidrs[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = merge(var.tags, {

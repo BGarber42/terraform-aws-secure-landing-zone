@@ -13,6 +13,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
+## [0.5.0] - 2025-08-07
+
+### Added
+- **Dynamic CIDR calculation** using Terraform's `cidrsubnet` function
+- **Automatic subnet CIDR generation** based on VPC CIDR and subnet counts
+- **New variables** `public_subnet_count` and `private_subnet_count` for easy scaling
+- **Built-in validation** to prevent CIDR conflicts and VPC capacity issues
+- **Backward compatibility** with existing custom CIDR specifications
+
+### Changed
+- **VPC module** now supports automatic CIDR calculation with fallback to custom CIDRs
+- **Subnet creation** simplified with count-based configuration
+- **Validation** updated to use modern `terraform_data` resource instead of deprecated `null_data_source`
+
+### Technical Details
+- **CIDR Calculation**: Uses `cidrsubnet(var.vpc_cidr, 8, index)` for /24 subnets
+- **Validation**: Prevents overlapping CIDRs and validates against VPC capacity
+- **Compatibility**: Works with both Terraform >= 1.5.0 and OpenTofu >= 1.5.0
+- **Examples**: Updated all examples to demonstrate new dynamic CIDR approach
+
+### Migration Guide
+Existing configurations continue to work without changes. To use the new dynamic CIDR feature:
+
+```hcl
+# New approach with automatic CIDR calculation
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+  
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  # VPC Configuration with automatic CIDR calculation
+  vpc_cidr             = "10.0.0.0/16"
+  public_subnet_count  = 3  # Creates 10.0.1.0/24, 10.0.2.0/24, 10.0.3.0/24
+  private_subnet_count = 3  # Creates 10.0.4.0/24, 10.0.5.0/24, 10.0.6.0/24
+}
+```
+
 ## [0.4.4] - 2025-08-07
 
 ### Added
