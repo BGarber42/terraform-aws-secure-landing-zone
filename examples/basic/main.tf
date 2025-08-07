@@ -23,8 +23,8 @@ module "landing_zone" {
   account_id             = data.aws_caller_identity.current.account_id
   region                 = var.region
   cloudtrail_bucket_name = var.cloudtrail_bucket_name
-  guardduty_kms_key_arn  = var.guardduty_kms_key_arn
-  tags                   = var.tags
+
+  tags = var.tags
 }
 
 # Outputs from the landing zone module

@@ -111,11 +111,7 @@ variable "guardduty_findings_bucket_name" {
   default     = "my-org-guardduty-findings-full"
 }
 
-variable "guardduty_kms_key_arn" {
-  description = "KMS key ARN for GuardDuty publishing destination"
-  type        = string
-  default     = ""
-}
+
 
 # Budget Configuration
 variable "enable_budget_alerts" {
