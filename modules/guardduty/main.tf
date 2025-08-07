@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # GuardDuty Detector
 resource "aws_guardduty_detector" "main" {
   count = var.enable_guardduty ? 1 : 0
@@ -41,13 +27,7 @@ resource "aws_guardduty_detector_feature" "malware_protection" {
   status      = "ENABLED"
 }
 
-# Data source to reference shared S3 encryption key
-data "aws_kms_key" "s3_encryption" {
-  key_id = "alias/s3-encryption"
-}
 
-# Note: Using shared S3 encryption key from CloudTrail module
-# This reduces KMS key proliferation while maintaining security
 
 # GuardDuty Publishing Destination (S3)
 resource "aws_s3_bucket" "guardduty_findings" {
@@ -80,7 +60,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "guardduty_finding
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = data.aws_kms_key.s3_encryption.arn
+      kms_master_key_id = var.s3_encryption_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
@@ -138,7 +118,7 @@ resource "aws_guardduty_publishing_destination" "main" {
   detector_id      = aws_guardduty_detector.main[0].id
   destination_type = "S3"
   destination_arn  = aws_s3_bucket.guardduty_findings[0].arn
-  kms_key_arn      = data.aws_kms_key.s3_encryption.arn
+  kms_key_arn      = var.s3_encryption_key_arn
 
   depends_on = [aws_s3_bucket_policy.guardduty_findings]
 } 

@@ -1,20 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
-# Note: Using shared S3 encryption key passed from root module
-# This ensures proper dependency management
-
 # S3 Bucket for CloudTrail logs
 resource "aws_s3_bucket" "cloudtrail" {
   bucket = var.cloudtrail_bucket_name

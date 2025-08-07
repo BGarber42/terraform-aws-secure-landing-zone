@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # IAM Role for AWS Config
 resource "aws_iam_role" "config" {
   name = "aws-config-role"
@@ -34,8 +20,7 @@ resource "aws_iam_role" "config" {
   })
 }
 
-# Note: Using shared SNS encryption key passed from root module
-# This ensures proper dependency management
+
 
 # SNS Topic for AWS Config notifications
 resource "aws_sns_topic" "config" {
