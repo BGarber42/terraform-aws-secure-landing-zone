@@ -120,14 +120,14 @@ This approach allows complete cleanup including protected resources when `preven
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.9.0 |
-| aws | >= 5.0.0 |
+| terraform | >= 1.12.2 |
+| aws | >= 6.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 5.0.0 |
+| aws | >= 6.0.0 |
 
 ## Inputs
 
