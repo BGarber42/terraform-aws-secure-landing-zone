@@ -2,6 +2,99 @@
 
 This project uses a linear history workflow to maintain clean commit history and simplify release management.
 
+## Quick Reference
+
+### 1. Creating a New Feature
+```bash
+# Start from develop
+git checkout develop
+git pull origin develop
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+
+# Make changes and commit
+git add .
+git commit -m "feat: add new feature"
+git push origin feature/your-feature-name
+
+# Create PR: feature → develop
+gh pr create --title "feat: add new feature" --base develop
+```
+
+### 2. Merging Feature to Develop
+```bash
+# Review PR in GitHub
+# Ensure all checks pass
+# Get required approval (1 reviewer)
+# Merge with rebase to maintain linear history
+gh pr merge <PR_NUMBER> --rebase
+```
+
+### 3. Creating a Versioned Release
+
+#### Option A: Direct Release (Recommended)
+```bash
+# Create release branch from develop
+git checkout develop
+git checkout -b release/v1.2.3
+
+# Update CHANGELOG.md with release notes
+# Edit CHANGELOG.md
+git add CHANGELOG.md
+git commit -m "docs: update CHANGELOG for v1.2.3"
+git push origin release/v1.2.3
+
+# Merge develop into main
+git checkout main
+git merge develop --no-ff -m "Release v1.2.3"
+
+# Create version tag
+git tag v1.2.3
+git push origin main
+git push origin v1.2.3
+
+# Create GitHub release
+gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
+
+# Reset develop to match main
+git checkout develop
+git reset --hard main
+git push origin develop --force
+```
+
+#### Option B: PR-Based Release
+```bash
+# Create release branch from develop
+git checkout develop
+git checkout -b release/v1.2.3
+
+# Update CHANGELOG.md with release notes
+# Edit CHANGELOG.md
+git add CHANGELOG.md
+git commit -m "docs: update CHANGELOG for v1.2.3"
+git push origin release/v1.2.3
+
+# Create PR: release → main
+gh pr create --title "Release v1.2.3" --base main
+
+# After PR is merged, create tag and release
+git checkout main
+git pull origin main
+git tag v1.2.3
+git push origin v1.2.3
+
+# Create GitHub release
+gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
+
+# Reset develop to match main
+git checkout develop
+git reset --hard main
+git push origin develop --force
+```
+
+> **Note**: For additional release automation scripts, see [`scripts/README.md`](../scripts/README.md).
+
 ## Workflow Overview
 
 ```
@@ -66,18 +159,38 @@ git push origin feature/your-feature-name
 ### 4. Release Process
 ```bash
 # When ready for release
+# 1. Create release branch from develop
+git checkout develop
+git checkout -b release/v1.2.3
+
+# 2. Update CHANGELOG.md with release notes
+# Edit CHANGELOG.md with release notes
+git add CHANGELOG.md
+git commit -m "docs: update CHANGELOG for v1.2.3"
+git push origin release/v1.2.3
+
+# 3. Create PR: release → main
+gh pr create --title "Release v1.2.3" --base main
+
+# 4. After PR is merged, create tag and release
 git checkout main
-git merge develop --ff-only  # Fast-forward merge
-git tag v1.2.3  # Tag the release
-git push origin main --tags
+git pull origin main
+git tag v1.2.3
+git push origin v1.2.3
+
+# 5. Create GitHub release
+gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
+
+# 6. Reset develop to match main
+git checkout develop
+git reset --hard main
+git push origin develop --force
 ```
 
-### 5. Reset Develop
+### 5. Post-Release Cleanup
 ```bash
-# After successful release
-git checkout develop
-git reset --hard main  # Reset develop to match main
-git push origin develop --force
+# Develop branch is automatically reset to match main
+# This maintains linear history and prepares for next development cycle
 ```
 
 ## Benefits
@@ -164,6 +277,27 @@ git add .
 git rebase --continue
 ```
 
+## Simplified Release Workflow
+
+### When Release Branches Are Required
+- **Branch Protection**: Develop branch requires PR reviews, cannot commit directly
+- **Release Preparation**: Need to update CHANGELOG.md and prepare release notes
+- **Linear History**: Release script expects develop → main workflow
+- **Status Checks**: Release branches allow proper CI/CD validation
+
+### Release Process (With Release Branches)
+1. **Create release branch** from develop
+2. **Update CHANGELOG.md** with release notes in release branch
+3. **Create PR** from release branch to main (for status checks)
+4. **Merge PR** and create version tag
+5. **Create GitHub release** with changelog notes
+6. **Reset develop** to match main for linear history
+
+### When to Skip Release Branches
+- **Hotfixes**: Direct develop → main for urgent fixes
+- **Simple Releases**: When no CHANGELOG updates needed
+- **Automated Releases**: When CI/CD handles release preparation
+
 ## Release Management
 
 1. **Versioning**: Use semantic versioning (MAJOR.MINOR.PATCH)
@@ -177,3 +311,14 @@ git rebase --continue
 - **Main Validation**: Comprehensive validation for main branch
 - **Security Scanning**: tfsec integration for security analysis
 - **Testing**: Terratest for infrastructure validation
+
+## Workflow Optimizations
+
+This project includes automated release scripts to streamline the release process. For detailed documentation of these scripts, see [`scripts/README.md`](../scripts/README.md).
+
+### Benefits of Optimization
+- ✅ **Reduced Manual Steps**: Automated CHANGELOG updates
+- ✅ **Consistent Process**: Standardized release workflow
+- ✅ **Error Prevention**: Scripts validate prerequisites
+- ✅ **Clear Instructions**: Built-in guidance for next steps
+- ✅ **Flexible Options**: Choose automated or manual process
