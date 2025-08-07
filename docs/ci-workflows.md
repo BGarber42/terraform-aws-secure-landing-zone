@@ -67,17 +67,7 @@ This repository uses a multi-stage CI/CD approach to optimize efficiency and ens
 - **Develop Level:** Comprehensive validation
 - **Main Level:** Full integration testing
 
-## Branch Protection Rules
 
-### Develop Branch
-- Requires `pr-checks.yml` to pass
-- Requires `ci.yml` to pass
-- No direct pushes (PRs only)
-
-### Main Branch
-- Requires `main-validation.yml` to pass
-- Requires PR from develop
-- No direct pushes (PRs only)
 
 ## Troubleshooting
 
