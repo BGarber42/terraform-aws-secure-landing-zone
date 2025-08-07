@@ -41,4 +41,9 @@ variable "budget_alert_subscribers" {
   description = "List of email addresses to receive budget alerts"
   type        = list(string)
   default     = []
+}
+
+variable "sns_encryption_key_arn" {
+  description = "ARN of the KMS key for SNS encryption"
+  type        = string
 } 

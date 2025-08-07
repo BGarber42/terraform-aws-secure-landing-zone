@@ -47,7 +47,7 @@ output "cloudtrail_arn" {
 
 output "cloudtrail_kms_key_arn" {
   description = "ARN of the KMS key used for CloudTrail encryption (if enabled)"
-  value       = module.cloudtrail.kms_key_arn
+  value       = var.cloudtrail_enable_kms ? aws_kms_key.s3_encryption.arn : null
 }
 
 # AWS Config Outputs
@@ -160,4 +160,25 @@ output "macie_buckets_to_scan_count" {
 output "s3_block_public_access_enabled" {
   description = "Whether S3 Block Public Access is enabled"
   value       = var.enable_s3_block_public_access
+}
+
+# Shared KMS Key Outputs
+output "s3_encryption_key_arn" {
+  description = "ARN of the shared S3 encryption KMS key"
+  value       = aws_kms_key.s3_encryption.arn
+}
+
+output "s3_encryption_key_id" {
+  description = "ID of the shared S3 encryption KMS key"
+  value       = aws_kms_key.s3_encryption.id
+}
+
+output "sns_encryption_key_arn" {
+  description = "ARN of the shared SNS encryption KMS key"
+  value       = aws_kms_key.sns_notifications.arn
+}
+
+output "sns_encryption_key_id" {
+  description = "ID of the shared SNS encryption KMS key"
+  value       = aws_kms_key.sns_notifications.id
 } 

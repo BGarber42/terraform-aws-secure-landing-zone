@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # IAM Role for AWS Config
 resource "aws_iam_role" "config" {
   name = "aws-config-role"
@@ -31,6 +17,18 @@ resource "aws_iam_role" "config" {
 
   tags = merge(var.tags, {
     Name = "aws-config-role"
+  })
+}
+
+
+
+# SNS Topic for AWS Config notifications
+resource "aws_sns_topic" "config" {
+  name              = "aws-config-notifications"
+  kms_master_key_id = var.sns_encryption_key_arn
+
+  tags = merge(var.tags, {
+    Name = "aws-config-notifications"
   })
 }
 
@@ -63,7 +61,7 @@ resource "aws_iam_role_policy" "config" {
         Action = [
           "sns:Publish"
         ]
-        Resource = "*"
+        Resource = aws_sns_topic.config.arn
       }
     ]
   })

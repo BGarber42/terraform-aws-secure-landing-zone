@@ -22,6 +22,7 @@ variable "tags" {
 variable "config_bucket_name" {
   description = "Name of the S3 bucket for AWS Config logs"
   type        = string
+  default     = "config-logs"
 }
 
 variable "config_rules" {
@@ -34,4 +35,9 @@ variable "config_rules" {
     "s3-bucket-versioning-enabled"      = "S3_BUCKET_VERSIONING_ENABLED"
     "s3-bucket-logging-enabled"         = "S3_BUCKET_LOGGING_ENABLED"
   }
+}
+
+variable "sns_encryption_key_arn" {
+  description = "ARN of the KMS key for SNS encryption"
+  type        = string
 } 

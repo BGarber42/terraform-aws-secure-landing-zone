@@ -16,11 +16,7 @@ variable "cloudtrail_bucket_name" {
   default     = "my-org-cloudtrail-logs-basic"
 }
 
-variable "guardduty_kms_key_arn" {
-  description = "KMS key ARN for GuardDuty publishing destination"
-  type        = string
-  default     = ""
-}
+
 
 variable "tags" {
   description = "Tags to apply to all resources"
