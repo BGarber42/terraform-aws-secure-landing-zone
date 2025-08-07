@@ -13,6 +13,7 @@ variable "region" {
 variable "cloudtrail_bucket_name" {
   description = "Name of the S3 bucket for CloudTrail logs"
   type        = string
+  default     = "my-org-cloudtrail-logs-basic"
 }
 
 variable "guardduty_kms_key_arn" {

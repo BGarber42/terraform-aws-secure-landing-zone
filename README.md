@@ -96,12 +96,33 @@ See the `examples/` directory for complete usage examples:
 
 ## Testing
 
+### Local Testing
+
 Run the Terratest suite locally:
 
 ```bash
 cd test
 go test -timeout 30m
 ```
+
+### GitHub Actions Testing
+
+Run GitHub Actions locally using [act](https://github.com/nektos/act):
+
+```bash
+# Setup secrets
+cp .secrets.example .secrets
+# Edit .secrets with your AWS credentials
+
+# Run all tests
+act --secret-file .secrets -W .github/workflows/ci.yml
+
+# Run specific jobs
+act --secret-file .secrets -W .github/workflows/ci.yml validate
+act --secret-file .secrets -W .github/workflows/ci.yml test
+```
+
+See [docs/local-testing.md](docs/local-testing.md) for detailed instructions.
 
 ## Contributing
 

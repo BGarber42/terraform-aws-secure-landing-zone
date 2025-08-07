@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  security-events: write
+
 env:
   AWS_DEFAULT_REGION: us-east-1
   TF_LOG: INFO
