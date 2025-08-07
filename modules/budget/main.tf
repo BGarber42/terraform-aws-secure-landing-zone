@@ -12,11 +12,71 @@ provider "aws" {
   region = var.region
 }
 
+# KMS Key for SNS topic encryption
+resource "aws_kms_key" "budget_sns" {
+  count = var.enable_budget_alerts ? 1 : 0
+
+  description             = "KMS key for budget SNS topic encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${var.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow SNS to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Budgets to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "budgets.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "budget-sns-key"
+  })
+}
+
+# KMS Alias for budget SNS
+resource "aws_kms_alias" "budget_sns" {
+  count         = var.enable_budget_alerts ? 1 : 0
+  name          = "alias/budget-sns"
+  target_key_id = aws_kms_key.budget_sns[0].key_id
+}
+
 # SNS Topic for budget notifications
 resource "aws_sns_topic" "budget" {
   count = var.enable_budget_alerts ? 1 : 0
 
-  name = "landing-zone-budget-alerts"
+  name              = "landing-zone-budget-alerts"
+  kms_master_key_id = aws_kms_key.budget_sns[0].arn
 
   tags = merge(var.tags, {
     Name = "landing-zone-budget-alerts"

@@ -22,6 +22,7 @@ variable "tags" {
 variable "cloudtrail_bucket_name" {
   description = "Name of the S3 bucket for CloudTrail logs"
   type        = string
+  default     = "cloudtrail-logs"
 }
 
 variable "cloudtrail_enable_kms" {

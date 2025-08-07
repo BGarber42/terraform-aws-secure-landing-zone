@@ -57,7 +57,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = aws_kms_key.cloudtrail[0].arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -134,6 +135,7 @@ resource "aws_cloudtrail" "main" {
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_logging                = true
+  enable_log_file_validation    = true
 
   kms_key_id = var.cloudtrail_enable_kms ? aws_kms_key.cloudtrail[0].arn : null
 

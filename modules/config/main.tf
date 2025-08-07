@@ -34,6 +34,15 @@ resource "aws_iam_role" "config" {
   })
 }
 
+# SNS Topic for AWS Config notifications
+resource "aws_sns_topic" "config" {
+  name = "aws-config-notifications"
+
+  tags = merge(var.tags, {
+    Name = "aws-config-notifications"
+  })
+}
+
 # IAM Role Policy for AWS Config
 resource "aws_iam_role_policy" "config" {
   name = "aws-config-policy"
@@ -63,7 +72,7 @@ resource "aws_iam_role_policy" "config" {
         Action = [
           "sns:Publish"
         ]
-        Resource = "*"
+        Resource = aws_sns_topic.config.arn
       }
     ]
   })

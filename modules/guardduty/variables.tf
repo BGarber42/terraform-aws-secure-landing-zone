@@ -28,6 +28,7 @@ variable "enable_guardduty" {
 variable "guardduty_findings_bucket_name" {
   description = "Name of the S3 bucket for GuardDuty findings"
   type        = string
+  default     = "guardduty-findings"
 }
 
 variable "guardduty_kms_key_arn" {
