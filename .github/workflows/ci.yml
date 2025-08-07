@@ -85,6 +85,18 @@ jobs:
         working_directory: .
         format: sarif
         
+    - name: Check if SARIF file exists
+      run: |
+        if [ -f tfsec.sarif ]; then
+          echo "SARIF file found:"
+          ls -la tfsec.sarif
+          echo "File content preview:"
+          head -20 tfsec.sarif
+        else
+          echo "SARIF file not found. Creating empty file for upload."
+          echo '{"version":"2.1.0","$schema":"https://json.schemastore.org/sarif-2.1.0-rtm.5.json","runs":[]}' > tfsec.sarif
+        fi
+        
     - name: Upload tfsec results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
       if: always()

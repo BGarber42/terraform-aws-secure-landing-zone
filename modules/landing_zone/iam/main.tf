@@ -32,12 +32,7 @@ resource "aws_iam_role" "roles" {
     ]
   })
 
-  dynamic "permissions_boundary" {
-    for_each = each.value.permission_boundary != null ? [each.value.permission_boundary] : []
-    content {
-      permissions_boundary_arn = permissions_boundary.value
-    }
-  }
+  permissions_boundary = each.value.permission_boundary
 
   tags = merge(var.tags, {
     Name = each.value.name

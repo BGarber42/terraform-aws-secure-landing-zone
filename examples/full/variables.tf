@@ -108,6 +108,12 @@ variable "guardduty_findings_bucket_name" {
   type        = string
 }
 
+variable "guardduty_kms_key_arn" {
+  description = "KMS key ARN for GuardDuty publishing destination"
+  type        = string
+  default     = ""
+}
+
 # Budget Configuration
 variable "enable_budget_alerts" {
   description = "Enable budget alerts and notifications"

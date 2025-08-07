@@ -64,6 +64,7 @@ resource "aws_macie2_findings_filter" "high_severity" {
 
   name        = "high-severity-findings"
   description = "Filter for high severity findings"
+  action      = "ARCHIVE"
 
   finding_criteria {
     criterion {

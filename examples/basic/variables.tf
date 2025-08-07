@@ -14,6 +14,12 @@ variable "cloudtrail_bucket_name" {
   type        = string
 }
 
+variable "guardduty_kms_key_arn" {
+  description = "KMS key ARN for GuardDuty publishing destination"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

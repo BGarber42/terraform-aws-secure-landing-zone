@@ -64,6 +64,7 @@ module "guardduty" {
   region                         = var.region
   enable_guardduty               = var.enable_guardduty
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
+  guardduty_kms_key_arn          = var.guardduty_kms_key_arn
   tags                           = var.tags
 }
 

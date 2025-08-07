@@ -34,6 +34,12 @@ variable "guardduty_findings_bucket_name" {
   default     = "my-org-guardduty-findings-advanced"
 }
 
+variable "guardduty_kms_key_arn" {
+  description = "KMS key ARN for GuardDuty publishing destination"
+  type        = string
+  default     = ""
+}
+
 variable "budget_limit_usd" {
   description = "Monthly budget limit in USD"
   type        = number

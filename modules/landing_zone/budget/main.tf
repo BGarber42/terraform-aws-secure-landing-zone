@@ -116,6 +116,7 @@ resource "aws_budgets_budget_action" "cost_control" {
   action_type        = "APPLY_IAM_POLICY"
   approval_model     = "AUTOMATIC"
   execution_role_arn = aws_iam_role.budget_action[0].arn
+  notification_type  = "ACTUAL"
 
   action_threshold {
     action_threshold_type  = "PERCENTAGE"
@@ -128,7 +129,7 @@ resource "aws_budgets_budget_action" "cost_control" {
     }
   }
 
-  subscribers {
+  subscriber {
     address           = var.budget_alert_subscribers[0]
     subscription_type = "EMAIL"
   }

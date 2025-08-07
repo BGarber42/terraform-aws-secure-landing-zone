@@ -18,27 +18,27 @@ resource "aws_guardduty_detector" "main" {
 
   enable = true
 
-  datasources {
-    s3_logs {
-      enable = true
-    }
-    kubernetes {
-      audit_logs {
-        enable = false
-      }
-    }
-    malware_protection {
-      scan_ec2_instance_with_findings {
-        ebs_volumes {
-          enable = true
-        }
-      }
-    }
-  }
-
   tags = merge(var.tags, {
     Name = "landing-zone-guardduty-detector"
   })
+}
+
+# GuardDuty Feature - S3 Logs
+resource "aws_guardduty_detector_feature" "s3_logs" {
+  count = var.enable_guardduty ? 1 : 0
+
+  detector_id = aws_guardduty_detector.main[0].id
+  name        = "S3_DATA_EVENTS"
+  status      = "ENABLED"
+}
+
+# GuardDuty Feature - Malware Protection
+resource "aws_guardduty_detector_feature" "malware_protection" {
+  count = var.enable_guardduty ? 1 : 0
+
+  detector_id = aws_guardduty_detector.main[0].id
+  name        = "EBS_MALWARE_PROTECTION"
+  status      = "ENABLED"
 }
 
 # GuardDuty Publishing Destination (S3)
@@ -129,6 +129,7 @@ resource "aws_guardduty_publishing_destination" "main" {
   detector_id      = aws_guardduty_detector.main[0].id
   destination_type = "S3"
   destination_arn  = aws_s3_bucket.guardduty_findings[0].arn
+  kms_key_arn      = var.guardduty_kms_key_arn
 
   depends_on = [aws_s3_bucket_policy.guardduty_findings]
 } 

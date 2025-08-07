@@ -68,6 +68,7 @@ module "landing_zone" {
   # GuardDuty Configuration
   enable_guardduty               = true
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
+  guardduty_kms_key_arn          = var.guardduty_kms_key_arn
 
   # Budget Configuration
   enable_budget_alerts     = true
@@ -85,9 +86,9 @@ module "landing_zone" {
   enable_macie                       = true
   macie_finding_publishing_frequency = "FIFTEEN_MINUTES"
   enable_macie_s3_classification     = true
-  s3_buckets_to_scan                 = var.macie_s3_buckets_to_scan
-  excluded_file_extensions           = ["jpg", "jpeg", "png", "gif", "mp4", "avi", "mov", "pdf"]
-  custom_data_identifiers = {
+  macie_s3_buckets_to_scan           = var.macie_s3_buckets_to_scan
+  macie_excluded_file_extensions     = ["jpg", "jpeg", "png", "gif", "mp4", "avi", "mov", "pdf"]
+  macie_custom_data_identifiers = {
     "credit_card_pattern" = {
       description  = "Credit card number pattern"
       regex        = "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"

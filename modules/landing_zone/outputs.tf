@@ -19,10 +19,25 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
+output "internet_gateway_id" {
+  description = "The ID of the Internet Gateway"
+  value       = module.vpc.internet_gateway_id
+}
+
+output "nat_gateway_id" {
+  description = "The ID of the NAT Gateway"
+  value       = module.vpc.nat_gateway_id
+}
+
 # CloudTrail Outputs
 output "cloudtrail_bucket_arn" {
   description = "ARN of the CloudTrail S3 bucket"
   value       = module.cloudtrail.bucket_arn
+}
+
+output "cloudtrail_bucket_name" {
+  description = "Name of the CloudTrail S3 bucket"
+  value       = module.cloudtrail.bucket_name
 }
 
 output "cloudtrail_arn" {
@@ -43,7 +58,12 @@ output "config_rule_arns" {
 
 output "config_recorder_arn" {
   description = "ARN of the AWS Config recorder"
-  value       = module.config.recorder_arn
+  value       = module.config.recorder_name
+}
+
+output "config_recorder_name" {
+  description = "Name of the AWS Config recorder"
+  value       = module.config.recorder_name
 }
 
 # IAM Outputs

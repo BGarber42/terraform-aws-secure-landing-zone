@@ -1,6 +1,9 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Terraform lock files
+*.lock.hcl
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -56,6 +59,7 @@ NOTES.md
 testing-guide.md
 *.tmp
 *.temp
+.secrets
 
 # Test artifacts
 test-results/

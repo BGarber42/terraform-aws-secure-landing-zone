@@ -17,7 +17,7 @@ resource "aws_securityhub_account" "main" {
 resource "aws_securityhub_standards_subscription" "cis_aws_foundations" {
   count = var.enable_security_hub && var.enable_cis_standard ? 1 : 0
 
-  standards_arn = "arn:aws:securityhub:${data.aws_region.current.name}::standards/cis-aws-foundations-benchmark/v/1.2.0"
+  standards_arn = "arn:aws:securityhub:${data.aws_region.current.region}::standards/cis-aws-foundations-benchmark/v/1.2.0"
 
   depends_on = [aws_securityhub_account.main]
 }
@@ -25,7 +25,7 @@ resource "aws_securityhub_standards_subscription" "cis_aws_foundations" {
 resource "aws_securityhub_standards_subscription" "pci_dss" {
   count = var.enable_security_hub && var.enable_pci_standard ? 1 : 0
 
-  standards_arn = "arn:aws:securityhub:${data.aws_region.current.name}::standards/pci-dss/v/3.2.1"
+  standards_arn = "arn:aws:securityhub:${data.aws_region.current.region}::standards/pci-dss/v/3.2.1"
 
   depends_on = [aws_securityhub_account.main]
 }
@@ -34,8 +34,9 @@ resource "aws_securityhub_standards_subscription" "pci_dss" {
 resource "aws_securityhub_action_target" "sns" {
   count = var.enable_security_hub && var.enable_action_targets ? 1 : 0
 
-  identifier = "SendToSNS"
-  name       = "Send findings to SNS"
+  identifier  = "SendToSNS"
+  name        = "Send findings to SNS"
+  description = "Send Security Hub findings to SNS topic"
 
   depends_on = [aws_securityhub_account.main]
 }
@@ -49,7 +50,8 @@ resource "aws_securityhub_insight" "high_severity_findings" {
 
   filters {
     severity_label {
-      eq = ["HIGH", "CRITICAL"]
+      comparison = "EQUALS"
+      value      = "HIGH"
     }
   }
 
@@ -64,7 +66,8 @@ resource "aws_securityhub_insight" "failed_compliance_checks" {
 
   filters {
     compliance_status {
-      eq = ["FAILED"]
+      comparison = "EQUALS"
+      value      = "FAILED"
     }
   }
 
