@@ -156,6 +156,104 @@ See the `examples/` directory for complete usage examples:
 - `examples/full/` - Complete configuration with all optional features enabled
 - `examples/advanced/` - Advanced configuration with Security Hub and Macie features
 
+## Advanced Features
+
+### Macie Custom Data Identifiers
+
+Configure custom data identifiers for sensitive data detection:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  enable_macie = true
+  macie_custom_data_identifiers = {
+    "credit_card_pattern" = {
+      description  = "Credit card number pattern"
+      regex        = "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+      keywords     = ["credit", "card", "payment"]
+      ignore_words = ["test", "example", "sample"]
+    },
+    "ssn_pattern" = {
+      description  = "Social Security Number pattern"
+      regex        = "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+      keywords     = ["ssn", "social", "security"]
+      ignore_words = ["test", "example"]
+    }
+  }
+}
+```
+
+### Security Hub Action Targets
+
+Configure Security Hub action targets for automated responses:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  enable_security_hub   = true
+  enable_action_targets = true
+  enable_cis_standard   = true
+  enable_pci_standard   = false
+}
+```
+
+### Budget Actions
+
+Configure automated budget actions for cost control:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  enable_budget_alerts     = true
+  enable_budget_actions    = true
+  budget_limit_usd         = 1000
+  budget_alert_subscribers = ["admin@example.com", "finance@example.com"]
+}
+```
+
+### Resource Protection with `prevent_destroy`
+
+The module includes built-in protection for critical resources:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  # Protect critical resources from accidental deletion
+  prevent_destroy = true  # Default: true for production
+  
+  # For testing environments, set to false for complete cleanup
+  # prevent_destroy = false
+}
+```
+
+**Protected Resources:**
+- S3 buckets (CloudTrail logs, GuardDuty findings)
+- KMS keys (encryption keys)
+- IAM roles and policies
+
+**Manual Cleanup (when `prevent_destroy = true`):**
+```bash
+# After terraform destroy, manually delete protected resources:
+aws s3 rb s3://your-cloudtrail-bucket-name --force
+aws s3 rb s3://your-guardduty-bucket-name --force
+```
+
 ## Development
 
 ### Git Workflow

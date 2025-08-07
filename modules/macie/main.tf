@@ -1,18 +1,8 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
 # Macie account
 resource "aws_macie2_account" "main" {
   count = var.enable_macie ? 1 : 0
 
-  finding_publishing_frequency = var.finding_publishing_frequency
+  finding_publishing_frequency = var.macie_finding_publishing_frequency
   status                       = "ENABLED"
 }
 

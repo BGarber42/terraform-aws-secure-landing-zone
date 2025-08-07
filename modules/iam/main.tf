@@ -52,7 +52,7 @@ resource "aws_iam_role_policy" "inline_policies" {
 resource "aws_iam_instance_profile" "ec2_profile" {
   count = var.create_ec2_instance_profile ? 1 : 0
   name  = "landing-zone-ec2-profile"
-  role  = aws_iam_role.roles["EC2Role"].name
+  role  = try(aws_iam_role.roles["EC2Role"].name, aws_iam_role.roles["PowerUserRestrictedIAM"].name)
 
   tags = merge(var.tags, {
     Name = "landing-zone-ec2-profile"

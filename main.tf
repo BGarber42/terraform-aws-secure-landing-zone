@@ -249,13 +249,13 @@ module "security_hub" {
 module "macie" {
   source = "./modules/macie"
 
-  account_id                   = var.account_id
-  region                       = var.region
-  enable_macie                 = var.enable_macie
-  finding_publishing_frequency = var.macie_finding_publishing_frequency
-  enable_s3_classification     = var.enable_macie_s3_classification
-  s3_buckets_to_scan           = var.macie_s3_buckets_to_scan
-  excluded_file_extensions     = var.macie_excluded_file_extensions
-  custom_data_identifiers      = var.macie_custom_data_identifiers
-  tags                         = var.tags
+  account_id                         = var.account_id
+  region                             = var.region
+  enable_macie                       = var.enable_macie
+  macie_finding_publishing_frequency = var.macie_finding_publishing_frequency
+  enable_s3_classification           = var.enable_macie_s3_classification
+  s3_buckets_to_scan                 = var.macie_s3_buckets_to_scan
+  excluded_file_extensions           = var.macie_excluded_file_extensions
+  custom_data_identifiers            = var.macie_custom_data_identifiers
+  tags                               = var.tags
 } 

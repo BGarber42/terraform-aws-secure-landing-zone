@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
 # Security Hub administrator account
 resource "aws_securityhub_account" "main" {
   count = var.enable_security_hub ? 1 : 0
