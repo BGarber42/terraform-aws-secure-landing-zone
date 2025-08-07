@@ -12,7 +12,9 @@ This module provides a complete foundation for AWS account security and complian
 - **IAM baseline roles** with least-privilege access
 - **GuardDuty** threat detection
 - **Budget monitoring** with cost alerts
-- **Optional security features** (Security Hub, Macie, S3 Block Public Access)
+- **Security Hub** centralized security findings and compliance standards
+- **Macie** data classification and privacy protection
+- **Advanced security features** (S3 Block Public Access, custom compliance rules)
 
 ## Quick Start
 
@@ -41,6 +43,8 @@ module "landing_zone" {
 | AWS Config | Configuration recorder with managed rules for compliance | `aws_config_configuration_recorder`, `aws_config_rule` |
 | IAM | Baseline roles with least-privilege access | `aws_iam_role`, `aws_iam_role_policy` |
 | GuardDuty | Threat detection and monitoring | `aws_guardduty_detector` |
+| Security Hub | Centralized security findings and compliance | `aws_securityhub_account`, `aws_securityhub_standards_subscription` |
+| Macie | Data classification and privacy protection | `aws_macie2_account`, `aws_macie2_classification_job` |
 | Budgets | Cost monitoring and alerting | `aws_budgets_budget` |
 
 ## Design Principles
@@ -88,6 +92,7 @@ See the `examples/` directory for complete usage examples:
 
 - `examples/basic/` - Minimal configuration with required variables only
 - `examples/full/` - Complete configuration with all optional features enabled
+- `examples/advanced/` - Advanced configuration with Security Hub and Macie features
 
 ## Testing
 
