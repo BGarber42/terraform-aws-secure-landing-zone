@@ -17,14 +17,14 @@ func TestMacieModule(t *testing.T) {
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../modules/macie",
 		Vars: map[string]interface{}{
-			"account_id":                   accountID,
-			"region":                       "us-east-1",
-			"enable_macie":                 true,
-			"finding_publishing_frequency": "FIFTEEN_MINUTES",
-			"enable_s3_classification":     true,
-			"s3_buckets_to_scan":           []string{"test-bucket-1", "test-bucket-2"},
-			"excluded_file_extensions":     []string{"jpg", "png", "gif"},
-			"custom_data_identifiers":      map[string]interface{}{},
+			"account_id":                         accountID,
+			"region":                             "us-east-1",
+			"enable_macie":                       true,
+			"macie_finding_publishing_frequency": "FIFTEEN_MINUTES",
+			"enable_s3_classification":           true,
+			"s3_buckets_to_scan":                 []string{"test-bucket-1", "test-bucket-2"},
+			"excluded_file_extensions":           []string{"jpg", "png", "gif"},
+			"custom_data_identifiers":            map[string]interface{}{},
 			"tags": map[string]string{
 				"Environment": "test",
 				"Owner":       "terratest",

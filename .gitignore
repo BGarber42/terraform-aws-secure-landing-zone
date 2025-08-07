@@ -1,9 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
 
-# Terraform lock files
-*.lock.hcl
-
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -32,19 +29,58 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 *.tfplan
+*.tfplan.json
 
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
 
-# IDE and editor files
+# Ignore Terraform lock files 
+.terraform.lock.hcl
+
+# Ignore any local secrets files
+.secrets
+.secrets.example
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Ignore AWS credentials and configuration
+.aws/
+aws-credentials
+aws-config
+
+# Ignore Terraform backend configuration with sensitive data
+backend.tf
+backend.tfvars
+
+# Ignore test artifacts
+test-results/
+coverage.out
+*.test
+
+# Ignore Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Note: go.sum files SHOULD be committed for reproducible tests
+# Do not ignore: test/go.sum
+
+# Ignore IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# Ignore OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -53,48 +89,50 @@ terraform.rc
 ehthumbs.db
 Thumbs.db
 
-# Development and planning files
-TODO.md
-NOTES.md
-testing-guide.md
+# Ignore log files
+*.log
+logs/
+
+# Ignore temporary files
 *.tmp
 *.temp
-.secrets
+temp/
+tmp/
 
-# Scripts directory (contains local deployment and cleanup scripts)
+# Ignore backup files
+*.bak
+*.backup
+*.old
+
+# Ignore scripts directory (as per project requirements)
 scripts/
 
-# Test artifacts
-test-results/
-coverage/
-test-deployment-test/
+# Ignore local development files
+.env
+.env.local
+.env.*.local
 
-# Python cache and temporary files
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Ignore documentation build artifacts
+docs/_build/
+docs/.doctrees/
 
-# Python virtual environments
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+# Ignore any local configuration files
+local.tfvars
+dev.tfvars
+prod.tfvars
+staging.tfvars
+
+# Ignore any files with sensitive data patterns
+*secret*
+*password*
+*token*
+*key*
+*credential*
+
+# Ignore any local override files
+local_override.tf
+dev_override.tf
+prod_override.tf
+
+# Ignore misc files
+TODO.md

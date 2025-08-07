@@ -90,6 +90,11 @@ variable "iam_roles" {
       name        = "PowerUserRestrictedIAM"
       description = "Power user role with restricted IAM access"
       policy_arn  = "arn:aws:iam::aws:policy/PowerUserAccess"
+    },
+    {
+      name        = "EC2Role"
+      description = "EC2 instance role for basic operations"
+      policy_arn  = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
     }
   ]
 }
@@ -123,7 +128,7 @@ variable "enable_budget_actions" {
 variable "budget_limit_usd" {
   description = "Monthly budget limit in USD"
   type        = number
-  default     = 500
+  default     = 1000
 }
 
 variable "budget_alert_subscribers" {
