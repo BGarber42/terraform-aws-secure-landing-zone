@@ -19,6 +19,12 @@ variable "tags" {
   }
 }
 
+variable "prevent_destroy" {
+  description = "Whether to prevent destruction of critical resources (S3 buckets, KMS keys). Set to false for testing environments."
+  type        = bool
+  default     = true
+}
+
 variable "enable_guardduty" {
   description = "Enable GuardDuty detector"
   type        = bool
@@ -28,7 +34,7 @@ variable "enable_guardduty" {
 variable "guardduty_findings_bucket_name" {
   description = "Name of the S3 bucket for GuardDuty findings"
   type        = string
-  default     = "guardduty-findings"
+  default     = ""
 }
 
 

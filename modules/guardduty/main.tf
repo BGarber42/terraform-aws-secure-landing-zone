@@ -27,27 +27,38 @@ resource "aws_guardduty_detector_feature" "malware_protection" {
   status      = "ENABLED"
 }
 
+# GuardDuty Publishing Destination (S3) - with prevent_destroy
+resource "aws_s3_bucket" "guardduty_findings_protected" {
+  count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" && var.prevent_destroy ? 1 : 0
+  bucket = var.guardduty_findings_bucket_name
+  tags = merge(var.tags, {
+    Name = "guardduty-findings-bucket"
+  })
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+}
 
-
-# GuardDuty Publishing Destination (S3)
-resource "aws_s3_bucket" "guardduty_findings" {
-  count = var.enable_guardduty ? 1 : 0
+# GuardDuty Publishing Destination (S3) - without prevent_destroy
+resource "aws_s3_bucket" "guardduty_findings_unprotected" {
+  count = var.enable_guardduty && var.guardduty_findings_bucket_name != "" && !var.prevent_destroy ? 1 : 0
 
   bucket = var.guardduty_findings_bucket_name
 
   tags = merge(var.tags, {
     Name = "guardduty-findings-bucket"
   })
+}
 
-  lifecycle {
-    prevent_destroy = true
-  }
+# Use the appropriate bucket based on prevent_destroy setting
+locals {
+  guardduty_bucket = var.prevent_destroy ? aws_s3_bucket.guardduty_findings_protected[0] : aws_s3_bucket.guardduty_findings_unprotected[0]
 }
 
 # S3 Bucket versioning for GuardDuty findings
 resource "aws_s3_bucket_versioning" "guardduty_findings" {
-  count  = var.enable_guardduty ? 1 : 0
-  bucket = aws_s3_bucket.guardduty_findings[0].id
+  count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" ? 1 : 0
+  bucket = local.guardduty_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -55,8 +66,8 @@ resource "aws_s3_bucket_versioning" "guardduty_findings" {
 
 # S3 Bucket encryption for GuardDuty findings
 resource "aws_s3_bucket_server_side_encryption_configuration" "guardduty_findings" {
-  count  = var.enable_guardduty ? 1 : 0
-  bucket = aws_s3_bucket.guardduty_findings[0].id
+  count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" ? 1 : 0
+  bucket = local.guardduty_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -68,8 +79,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "guardduty_finding
 
 # S3 Bucket public access block for GuardDuty findings
 resource "aws_s3_bucket_public_access_block" "guardduty_findings" {
-  count  = var.enable_guardduty ? 1 : 0
-  bucket = aws_s3_bucket.guardduty_findings[0].id
+  count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" ? 1 : 0
+  bucket = local.guardduty_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -79,8 +90,8 @@ resource "aws_s3_bucket_public_access_block" "guardduty_findings" {
 
 # S3 Bucket policy for GuardDuty findings
 resource "aws_s3_bucket_policy" "guardduty_findings" {
-  count  = var.enable_guardduty ? 1 : 0
-  bucket = aws_s3_bucket.guardduty_findings[0].id
+  count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" ? 1 : 0
+  bucket = local.guardduty_bucket.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -91,7 +102,32 @@ resource "aws_s3_bucket_policy" "guardduty_findings" {
           Service = "guardduty.amazonaws.com"
         }
         Action   = "s3:GetBucketAcl"
-        Resource = aws_s3_bucket.guardduty_findings[0].arn
+        Resource = local.guardduty_bucket.arn
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.account_id
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:guardduty:${var.region}:${var.account_id}:detector/*"
+          }
+        }
+      },
+      {
+        Sid    = "AWSGuardDutyLocation"
+        Effect = "Allow"
+        Principal = {
+          Service = "guardduty.amazonaws.com"
+        }
+        Action   = "s3:GetBucketLocation"
+        Resource = local.guardduty_bucket.arn
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.account_id
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:guardduty:${var.region}:${var.account_id}:detector/*"
+          }
+        }
       },
       {
         Sid    = "AWSGuardDutyWrite"
@@ -100,10 +136,14 @@ resource "aws_s3_bucket_policy" "guardduty_findings" {
           Service = "guardduty.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.guardduty_findings[0].arn}/*"
+        Resource = "${local.guardduty_bucket.arn}/*"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
+            "aws:SourceAccount" = var.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:guardduty:${var.region}:${var.account_id}:detector/*"
           }
         }
       }
@@ -113,11 +153,11 @@ resource "aws_s3_bucket_policy" "guardduty_findings" {
 
 # GuardDuty Publishing Destination
 resource "aws_guardduty_publishing_destination" "main" {
-  count = var.enable_guardduty ? 1 : 0
+  count = var.enable_guardduty && var.guardduty_findings_bucket_name != "" ? 1 : 0
 
   detector_id      = aws_guardduty_detector.main[0].id
   destination_type = "S3"
-  destination_arn  = aws_s3_bucket.guardduty_findings[0].arn
+  destination_arn  = local.guardduty_bucket.arn
   kms_key_arn      = var.s3_encryption_key_arn
 
   depends_on = [aws_s3_bucket_policy.guardduty_findings]

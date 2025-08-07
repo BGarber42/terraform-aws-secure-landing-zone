@@ -19,6 +19,12 @@ variable "tags" {
   }
 }
 
+variable "prevent_destroy" {
+  description = "Whether to prevent destruction of critical resources (S3 buckets, KMS keys). Set to false for testing environments."
+  type        = bool
+  default     = true
+}
+
 variable "cloudtrail_bucket_name" {
   description = "Name of the S3 bucket for CloudTrail logs"
   type        = string

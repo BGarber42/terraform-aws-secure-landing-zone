@@ -1,11 +1,11 @@
 output "bucket_arn" {
   description = "ARN of the CloudTrail S3 bucket"
-  value       = aws_s3_bucket.cloudtrail.arn
+  value       = local.cloudtrail_bucket.arn
 }
 
 output "bucket_name" {
   description = "Name of the CloudTrail S3 bucket"
-  value       = aws_s3_bucket.cloudtrail.bucket
+  value       = local.cloudtrail_bucket.bucket
 }
 
 output "cloudtrail_arn" {
