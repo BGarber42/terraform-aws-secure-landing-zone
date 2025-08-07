@@ -13,6 +13,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
+## [0.4.0] - 2024-12-19
+
+### Added
+- **EC2Role** to default IAM roles for better EC2 instance compatibility
+- **Comprehensive advanced feature documentation** in README.md
+  - Macie custom data identifiers configuration examples
+  - Security Hub action targets documentation
+  - Budget actions and automated cost control examples
+  - Resource protection with `prevent_destroy` documentation
+- **Enhanced .gitignore** with proper lock file exclusions and development patterns
+
+### Changed
+- **Standardized variable defaults** across modules (`budget_limit_usd` to 1000)
+- **Fixed Macie variable naming** consistency (`finding_publishing_frequency` → `macie_finding_publishing_frequency`)
+- **Updated example configurations** to use automatic account ID detection
+- **Enhanced README.md** with comprehensive advanced features section
+- **Improved test configurations** with proper variable names and paths
+
+### Fixed
+- **Critical IAM module reference** - Added EC2Role to default roles and made reference conditional
+- **Duplicate terraform blocks** removed from Security Hub and Macie modules
+- **Test path issues** - Fixed non-existent module path references
+- **Variable naming inconsistencies** across modules
+- **Example configuration cleanup** - Removed commented account_id variables
+- **Lock file configuration** - Proper .gitignore exclusions for published modules
+
+### Technical Details
+- **IAM Module**: Added EC2Role with `AmazonEC2ReadOnlyAccess` policy
+- **Macie Module**: Renamed variable for consistency and removed duplicate terraform block
+- **Security Hub Module**: Removed duplicate terraform block to prevent provider conflicts
+- **Test Files**: Updated paths and variable names for proper compilation
+- **Documentation**: Added comprehensive examples for advanced features
+- **Git Workflow**: Proper lock file handling for published Terraform modules
+
 ## [0.3.0] - 2024-08-07
 
 ### Added
