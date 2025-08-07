@@ -34,9 +34,9 @@ resource "aws_s3_bucket" "guardduty_findings_protected" {
   tags = merge(var.tags, {
     Name = "guardduty-findings-bucket"
   })
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # GuardDuty Publishing Destination (S3) - without prevent_destroy
