@@ -10,16 +10,28 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
+variable "public_subnet_count" {
+  description = "Number of public subnets to create (CIDRs will be calculated automatically)"
+  type        = number
+  default     = 2
+}
+
+variable "private_subnet_count" {
+  description = "Number of private subnets to create (CIDRs will be calculated automatically)"
+  type        = number
+  default     = 2
+}
+
 variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets"
+  description = "CIDR blocks for public subnets (optional, will be calculated if not provided)"
   type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+  default     = []
 }
 
 variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets"
+  description = "CIDR blocks for private subnets (optional, will be calculated if not provided)"
   type        = list(string)
-  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+  default     = []
 }
 
 variable "cloudtrail_bucket_name" {
