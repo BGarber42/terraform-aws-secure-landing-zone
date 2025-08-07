@@ -1,35 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
-# KMS Key for CloudTrail encryption (if enabled)
-resource "aws_kms_key" "cloudtrail" {
-  count                   = var.cloudtrail_enable_kms ? 1 : 0
-  description             = "KMS key for CloudTrail encryption"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-
-  tags = merge(var.tags, {
-    Name = "cloudtrail-kms-key"
-  })
-}
-
-resource "aws_kms_alias" "cloudtrail" {
-  count         = var.cloudtrail_enable_kms ? 1 : 0
-  name          = "alias/cloudtrail-key"
-  target_key_id = aws_kms_key.cloudtrail[0].id
-}
-
 # S3 Bucket for CloudTrail logs
 resource "aws_s3_bucket" "cloudtrail" {
   bucket = var.cloudtrail_bucket_name
@@ -57,7 +25,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = var.s3_encryption_key_arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -134,8 +103,9 @@ resource "aws_cloudtrail" "main" {
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_logging                = true
+  enable_log_file_validation    = true
 
-  kms_key_id = var.cloudtrail_enable_kms ? aws_kms_key.cloudtrail[0].arn : null
+  kms_key_id = var.cloudtrail_enable_kms ? var.s3_encryption_key_arn : null
 
   event_selector {
     read_write_type                  = "All"

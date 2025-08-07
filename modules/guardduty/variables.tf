@@ -31,8 +31,9 @@ variable "guardduty_findings_bucket_name" {
   default     = "guardduty-findings"
 }
 
-variable "guardduty_kms_key_arn" {
-  description = "KMS key ARN for GuardDuty publishing destination"
+
+
+variable "s3_encryption_key_arn" {
+  description = "ARN of the KMS key for S3 encryption"
   type        = string
-  default     = ""
 } 

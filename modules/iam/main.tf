@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # IAM Roles
 resource "aws_iam_role" "roles" {
   for_each = { for role in var.iam_roles : role.name => role }

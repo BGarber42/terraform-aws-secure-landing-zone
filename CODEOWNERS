@@ -1,0 +1,31 @@
+# Code Owners for Terraform AWS Secure Landing Zone
+# This file defines who is responsible for different parts of the codebase
+
+# Global owners - these people are responsible for the entire repository
+* @BGarber42
+
+# Core Terraform modules
+/modules/ @BGarber42
+
+# Examples and documentation
+/examples/ @BGarber42
+/docs/ @BGarber42
+README.md @BGarber42
+CHANGELOG.md @BGarber42
+
+# Tests
+/test/ @BGarber42
+
+# GitHub Actions workflows
+/.github/workflows/ @BGarber42
+
+# Terraform configuration files
+*.tf @BGarber42
+*.tfvars @BGarber42
+*.hcl @BGarber42
+
+# Documentation
+*.md @BGarber42
+
+# Scripts
+/scripts/ @BGarber42

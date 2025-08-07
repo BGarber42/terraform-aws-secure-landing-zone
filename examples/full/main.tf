@@ -41,7 +41,7 @@ module "landing_zone" {
   # GuardDuty Configuration
   enable_guardduty               = var.enable_guardduty
   guardduty_findings_bucket_name = var.guardduty_findings_bucket_name
-  guardduty_kms_key_arn          = var.guardduty_kms_key_arn
+
 
   # Budget Configuration
   enable_budget_alerts     = var.enable_budget_alerts
