@@ -1,8 +1,6 @@
-name: CI
+name: PR Checks
 
 on:
-  push:
-    branches: [ develop ]
   pull_request:
     branches: [ develop ]
 
@@ -98,8 +96,6 @@ jobs:
       with:
         sarif_file: tfsec.sarif
 
-
-
   documentation:
     name: Documentation Check
     runs-on: ubuntu-latest
@@ -121,4 +117,4 @@ jobs:
       run: |
         test -f LICENSE
         test -f CHANGELOG.md
-        test -d docs 
+        test -d docs
