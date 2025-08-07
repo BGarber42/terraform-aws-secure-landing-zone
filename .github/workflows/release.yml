@@ -6,11 +6,11 @@ on:
       - 'v*'
 
 env:
-  TF_REGISTRY_DISCOVERY_URL: https://registry.terraform.io/v1/modules
+  AWS_DEFAULT_REGION: us-east-1
 
 jobs:
   release:
-    name: Release to Terraform Registry
+    name: Create Release
     runs-on: ubuntu-latest
     
     steps:
@@ -18,34 +18,68 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: "1.9.0"
+        terraform_version: "1.12.2"
         
-    - name: Terraform Format Check
-      run: terraform fmt -check -recursive
-      
-    - name: Setup TFLint
-      uses: terraform-linters/setup-tflint@v4
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        tflint_version: v0.50.0
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
         
-    - name: TFLint
-      run: tflint --init && tflint
-      
-    - name: Publish to Terraform Registry
-      env:
-        TF_REGISTRY_TOKEN: ${{ secrets.TF_REGISTRY_TOKEN }}
+    - name: Validate Examples
       run: |
-        # Extract version from tag
-        VERSION=${GITHUB_REF#refs/tags/}
+        for example in examples/*/; do
+          echo "Validating $example"
+          cd "$example"
+          terraform init
+          terraform validate
+          cd ../..
+        done
         
-        # Create release archive
-        git archive --format=zip --output=module.zip HEAD
+    - name: Run Security Scan
+      uses: aquasecurity/tfsec-action@v1.0.3
+      with:
+        working_directory: .
+        format: sarif
         
-        # Upload to Terraform Registry
-        curl -X PUT \
-          -H "Authorization: Bearer $TF_REGISTRY_TOKEN" \
-          -H "Content-Type: application/octet-stream" \
-          --data-binary @module.zip \
-          "$TF_REGISTRY_DISCOVERY_URL/${{ github.repository }}/$VERSION" 
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## What's Changed
+          
+          ### Features
+          - Complete AWS Secure Landing Zone implementation
+          - VPC with public/private subnets across multiple AZs
+          - CloudTrail logging with centralized S3 storage
+          - AWS Config with managed compliance rules
+          - IAM baseline roles with least-privilege access
+          - GuardDuty threat detection
+          - Security Hub with CIS and PCI DSS standards
+          - Macie data classification and privacy protection
+          - Budget monitoring with cost alerts
+          
+          ### Examples
+          - Basic configuration for minimal setup
+          - Full configuration with all features enabled
+          - Advanced configuration with Security Hub and Macie
+          
+          ### Testing
+          - Comprehensive Terratest suite
+          - Security scanning with tfsec
+          - Automated CI/CD pipeline
+          
+          ### Documentation
+          - Complete README with usage examples
+          - Architecture documentation
+          - GCP variant planning
+          
+        draft: false
+        prerelease: false 

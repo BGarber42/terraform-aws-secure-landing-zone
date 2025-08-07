@@ -8,6 +8,7 @@ on:
 
 env:
   AWS_DEFAULT_REGION: us-east-1
+  TF_LOG: INFO
 
 jobs:
   fmt-lint:
@@ -33,6 +34,37 @@ jobs:
         
     - name: TFLint
       run: tflint --init && tflint
+
+  validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        example: [basic, full, advanced]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.12.2"
+        
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: Terraform Init and Validate
+      run: |
+        cd examples/${{ matrix.example }}
+        terraform init
+        terraform validate
+        terraform plan -out=tfplan
 
   security-scan:
     name: Security Scan
@@ -63,6 +95,10 @@ jobs:
     name: Terratest
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        test: [basic, security, full]
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -87,4 +123,34 @@ jobs:
     - name: Run Terratest
       run: |
         cd test
-        go test -timeout 30m -v 
+        go test -timeout 30m -v -run Test${{ matrix.test }}
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.test }}
+        path: test/*.log
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Check README exists
+      run: test -f README.md
+      
+    - name: Check examples exist
+      run: |
+        test -d examples/basic
+        test -d examples/full
+        test -d examples/advanced
+        
+    - name: Check documentation files
+      run: |
+        test -f LICENSE
+        test -f CHANGELOG.md
+        test -d docs 

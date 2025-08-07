@@ -53,6 +53,7 @@ Thumbs.db
 # Development and planning files
 TODO.md
 NOTES.md
+testing-guide.md
 *.tmp
 *.temp
 
