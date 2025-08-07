@@ -42,6 +42,7 @@ variable "private_subnet_cidrs" {
 variable "cloudtrail_bucket_name" {
   description = "Name of the S3 bucket for CloudTrail logs"
   type        = string
+  default     = "cloudtrail-logs"
 }
 
 variable "cloudtrail_enable_kms" {
@@ -97,13 +98,7 @@ variable "enable_guardduty" {
 variable "guardduty_findings_bucket_name" {
   description = "Name of the S3 bucket for GuardDuty findings"
   type        = string
-  default     = ""
-}
-
-variable "guardduty_kms_key_arn" {
-  description = "KMS key ARN for GuardDuty publishing destination"
-  type        = string
-  default     = ""
+  default     = "guardduty-findings"
 }
 
 # Budget Variables

@@ -24,7 +24,7 @@ func TestGuardDutyModule(t *testing.T) {
 			"region":                         "us-east-1",
 			"enable_guardduty":               true,
 			"guardduty_findings_bucket_name": findingsBucketName,
-			"guardduty_kms_key_arn":          "",
+	
 			"tags": map[string]string{
 				"Environment": "test",
 				"Owner":       "terratest",
