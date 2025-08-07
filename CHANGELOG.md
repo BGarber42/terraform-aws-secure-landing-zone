@@ -13,6 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
+## [0.4.1] - 2024-12-19
+
+### Added
+- **Optimized Git workflow documentation** with clear release process instructions
+- **Updated CI/CD workflow documentation** to reflect current GitHub Actions structure
+- **GitHub rulesets optimization** for release branches and main branch flexibility
+- **Release branch protection rules** for streamlined release process
+
+### Changed
+- **Documentation structure** improved with proper separation of committed vs uncommitted content
+- **Main branch ruleset** now allows both merge and squash methods for flexibility
+- **Release process documentation** updated to use standard git commands
+- **Workflow documentation** moved script references to dedicated scripts folder
+
+### Fixed
+- **Documentation reliability** by removing references to uncommitted scripts
+- **Release process clarity** with step-by-step manual git workflow
+- **Branch protection rules** optimized for linear history workflow
+
+### Technical Details
+- **Main ruleset**: Added "squash" merge method alongside "merge" for flexibility
+- **Release ruleset**: Created new ruleset for `release/*` branches with streamlined requirements
+- **Documentation**: Moved script documentation to `scripts/README.md` for better organization
+- **Workflow**: Maintained linear history while supporting both automated and manual release processes
+
 ## [0.3.0] - 2024-08-07
 
 ### Added
