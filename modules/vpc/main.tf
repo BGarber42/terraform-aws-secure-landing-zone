@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # Data source for availability zones
 data "aws_availability_zones" "available" {
   state = "available"
@@ -35,7 +21,7 @@ resource "aws_subnet" "public" {
   cidr_block        = var.public_subnet_cidrs[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = var.map_public_ip_on_launch
 
   tags = merge(var.tags, {
     Name = "public-subnet-${count.index + 1}"

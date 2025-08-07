@@ -1,22 +1,9 @@
-terraform {
-  required_version = ">= 1.12.2"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 6.0.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.region
-}
-
 # SNS Topic for budget notifications
 resource "aws_sns_topic" "budget" {
   count = var.enable_budget_alerts ? 1 : 0
 
-  name = "landing-zone-budget-alerts"
+  name              = "landing-zone-budget-alerts"
+  kms_master_key_id = var.sns_encryption_key_arn
 
   tags = merge(var.tags, {
     Name = "landing-zone-budget-alerts"

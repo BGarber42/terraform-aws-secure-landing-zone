@@ -35,4 +35,10 @@ variable "private_subnet_cidrs" {
   description = "CIDR blocks for private subnets"
   type        = list(string)
   default     = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "map_public_ip_on_launch" {
+  description = "Whether to map public IP on launch for public subnets"
+  type        = bool
+  default     = false
 } 
