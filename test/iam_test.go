@@ -15,7 +15,7 @@ func TestIAMModule(t *testing.T) {
 	accountID := aws.GetAccountId(t)
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/iam",
+		TerraformDir: "../modules/iam",
 		Vars: map[string]interface{}{
 			"account_id": accountID,
 			"region":     "us-east-1",

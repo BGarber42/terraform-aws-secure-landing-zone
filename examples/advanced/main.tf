@@ -18,7 +18,7 @@ data "aws_region" "current" {}
 
 # Landing Zone Module with Advanced Features
 module "landing_zone" {
-  source = "../../modules/landing_zone"
+  source = "../.."
 
   # Basic Configuration
   account_id = data.aws_caller_identity.current.account_id

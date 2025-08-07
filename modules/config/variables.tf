@@ -22,6 +22,7 @@ variable "tags" {
 variable "config_bucket_name" {
   description = "Name of the S3 bucket for AWS Config logs"
   type        = string
+  default     = "config-logs"
 }
 
 variable "config_rules" {

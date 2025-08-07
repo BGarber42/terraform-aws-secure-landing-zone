@@ -17,7 +17,7 @@ data "aws_caller_identity" "current" {}
 
 # Complete Landing Zone Module
 module "landing_zone" {
-  source = "../../modules/landing_zone"
+  source = "../.."
 
   # Account and Region
   account_id = data.aws_caller_identity.current.account_id

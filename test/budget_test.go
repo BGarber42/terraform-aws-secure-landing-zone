@@ -15,7 +15,7 @@ func TestBudgetModule(t *testing.T) {
 	accountID := aws.GetAccountId(t)
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/budget",
+		TerraformDir: "../modules/budget",
 		Vars: map[string]interface{}{
 			"account_id":               accountID,
 			"region":                   "us-east-1",

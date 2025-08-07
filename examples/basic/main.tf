@@ -18,7 +18,7 @@ data "aws_caller_identity" "current" {}
 # This is a placeholder for the landing zone module
 # It will be implemented in subsequent phases
 module "landing_zone" {
-  source = "../../modules/landing_zone"
+  source = "../.."
 
   account_id             = data.aws_caller_identity.current.account_id
   region                 = var.region

@@ -14,7 +14,7 @@ provider "aws" {
 
 # VPC Module
 module "vpc" {
-  source = "./vpc"
+  source = "./modules/vpc"
 
   account_id           = var.account_id
   region               = var.region
@@ -26,7 +26,7 @@ module "vpc" {
 
 # CloudTrail Module
 module "cloudtrail" {
-  source = "./cloudtrail"
+  source = "./modules/cloudtrail"
 
   account_id             = var.account_id
   region                 = var.region
@@ -37,7 +37,7 @@ module "cloudtrail" {
 
 # AWS Config Module
 module "config" {
-  source = "./config"
+  source = "./modules/config"
 
   account_id         = var.account_id
   region             = var.region
@@ -48,7 +48,7 @@ module "config" {
 
 # IAM Module
 module "iam" {
-  source = "./iam"
+  source = "./modules/iam"
 
   account_id = var.account_id
   region     = var.region
@@ -58,7 +58,7 @@ module "iam" {
 
 # GuardDuty Module
 module "guardduty" {
-  source = "./guardduty"
+  source = "./modules/guardduty"
 
   account_id                     = var.account_id
   region                         = var.region
@@ -70,7 +70,7 @@ module "guardduty" {
 
 # Budget Module
 module "budget" {
-  source = "./budget"
+  source = "./modules/budget"
 
   account_id               = var.account_id
   region                   = var.region
@@ -83,7 +83,7 @@ module "budget" {
 
 # Security Hub Module
 module "security_hub" {
-  source = "./security_hub"
+  source = "./modules/security_hub"
 
   account_id            = var.account_id
   region                = var.region
@@ -96,7 +96,7 @@ module "security_hub" {
 
 # Macie Module
 module "macie" {
-  source = "./macie"
+  source = "./modules/macie"
 
   account_id                   = var.account_id
   region                       = var.region

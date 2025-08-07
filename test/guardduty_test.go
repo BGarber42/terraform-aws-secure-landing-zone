@@ -18,7 +18,7 @@ func TestGuardDutyModule(t *testing.T) {
 	findingsBucketName := "test-guardduty-findings-" + uniqueID
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/guardduty",
+		TerraformDir: "../modules/guardduty",
 		Vars: map[string]interface{}{
 			"account_id":                     accountID,
 			"region":                         "us-east-1",
