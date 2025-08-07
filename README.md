@@ -14,7 +14,6 @@ This module provides a complete foundation for AWS account security and complian
 - **Budget monitoring** with cost alerts
 - **Security Hub** centralized security findings and compliance standards
 - **Macie** data classification and privacy protection
-- **Advanced security features** (S3 Block Public Access, custom compliance rules)
 
 ## Quick Start
 
@@ -25,10 +24,7 @@ module "landing_zone" {
   account_id = "123456789012"
   region     = "us-east-1"
   
-  # Set to false for testing environments
-  prevent_destroy = false
-  
-  # VPC Configuration (CIDRs calculated automatically)
+  # VPC Configuration with automatic CIDR calculation
   vpc_cidr             = "10.0.0.0/16"
   public_subnet_count  = 2  # Creates 10.0.1.0/24, 10.0.2.0/24
   private_subnet_count = 2  # Creates 10.0.3.0/24, 10.0.4.0/24
@@ -47,28 +43,16 @@ module "landing_zone" {
 This module is fully compatible with OpenTofu. Simply replace `terraform` commands with `tofu`:
 
 ```bash
-# Initialize with OpenTofu
 tofu init
-
-# Plan with OpenTofu
 tofu plan
-
-# Apply with OpenTofu
 tofu apply
 ```
 
 ## Important Notes
 
-### Resources with `prevent_destroy` Protection
+### Resource Protection
 
-Some resources in this module have `lifecycle.prevent_destroy` enabled by default to prevent accidental deletion of critical infrastructure:
-
-- **S3 Buckets**: CloudTrail and GuardDuty S3 buckets are protected from accidental deletion
-- **KMS Keys**: Encryption keys are protected to prevent data loss
-
-#### Configurable Protection
-
-The `prevent_destroy` variable allows you to control this protection:
+Some resources have `lifecycle.prevent_destroy` enabled by default. Set `prevent_destroy = false` for testing environments:
 
 ```hcl
 module "landing_zone" {
@@ -76,45 +60,18 @@ module "landing_zone" {
 
   account_id = "123456789012"
   region     = "us-east-1"
-  
-  # Set to false for testing environments
-  prevent_destroy = false
+  prevent_destroy = false  # For testing environments
   
   cloudtrail_bucket_name = "my-org-cloudtrail-logs"
-  
-  tags = {
-    Environment = "production"
-    Owner       = "platform-team"
-  }
 }
 ```
 
-- **Production**: `prevent_destroy = true` (default) - Protects critical resources
-- **Testing**: `prevent_destroy = false` - Allows complete cleanup for testing
-
-#### Manual Cleanup (when prevent_destroy = true)
-
-When `prevent_destroy = true`, these protected resources must be manually deleted:
+When `prevent_destroy = true`, manually delete protected S3 buckets after `terraform destroy`:
 
 ```bash
-# After running terraform destroy, manually delete S3 buckets:
 aws s3 rb s3://your-cloudtrail-bucket-name --force
 aws s3 rb s3://your-guardduty-bucket-name --force
 ```
-
-#### Test Deployment
-
-For test deployments with `prevent_destroy = false`, you can use standard Terraform commands:
-
-```bash
-# Deploy test infrastructure
-terraform apply
-
-# Clean up test infrastructure
-terraform destroy
-```
-
-This approach allows complete cleanup including protected resources when `prevent_destroy = false`.
 
 ## Features
 
@@ -129,13 +86,6 @@ This approach allows complete cleanup including protected resources when `preven
 | Macie | Data classification and privacy protection | `aws_macie2_account`, `aws_macie2_classification_job` |
 | Budgets | Cost monitoring and alerting | `aws_budgets_budget` |
 
-## Design Principles
-
-- **Idempotent**: Safe to run multiple times without side effects
-- **Extensible**: Modular design allows easy customization and extension
-- **Secure-by-default**: Implements security best practices out of the box
-- **Compliant**: Follows AWS Well-Architected Framework and security standards
-
 ## Requirements
 
 | Name | Version |
@@ -143,13 +93,7 @@ This approach allows complete cleanup including protected resources when `preven
 | terraform | >= 1.5.0 |
 | aws | >= 6.0.0 |
 
-**Note:** This module is also compatible with OpenTofu >= 1.5.0. OpenTofu is a Terraform fork that maintains full compatibility with Terraform modules and providers.
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| aws | >= 6.0.0 |
+**Note:** This module is also compatible with OpenTofu >= 1.5.0.
 
 ## Inputs
 
@@ -180,71 +124,6 @@ See the `examples/` directory for complete usage examples:
 
 ## Advanced Features
 
-### Macie Custom Data Identifiers
-
-Configure custom data identifiers for sensitive data detection:
-
-```hcl
-module "landing_zone" {
-  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
-
-  account_id = "123456789012"
-  region     = "us-east-1"
-  
-  enable_macie = true
-  macie_custom_data_identifiers = {
-    "credit_card_pattern" = {
-      description  = "Credit card number pattern"
-      regex        = "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
-      keywords     = ["credit", "card", "payment"]
-      ignore_words = ["test", "example", "sample"]
-    },
-    "ssn_pattern" = {
-      description  = "Social Security Number pattern"
-      regex        = "\\b\\d{3}-\\d{2}-\\d{4}\\b"
-      keywords     = ["ssn", "social", "security"]
-      ignore_words = ["test", "example"]
-    }
-  }
-}
-```
-
-### Security Hub Action Targets
-
-Configure Security Hub action targets for automated responses:
-
-```hcl
-module "landing_zone" {
-  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
-
-  account_id = "123456789012"
-  region     = "us-east-1"
-  
-  enable_security_hub   = true
-  enable_action_targets = true
-  enable_cis_standard   = true
-  enable_pci_standard   = false
-}
-```
-
-### Budget Actions
-
-Configure automated budget actions for cost control:
-
-```hcl
-module "landing_zone" {
-  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
-
-  account_id = "123456789012"
-  region     = "us-east-1"
-  
-  enable_budget_alerts     = true
-  enable_budget_actions    = true
-  budget_limit_usd         = 1000
-  budget_alert_subscribers = ["admin@example.com", "finance@example.com"]
-}
-```
-
 ### Dynamic CIDR Calculation
 
 The module automatically calculates subnet CIDRs using Terraform's `cidrsubnet` function:
@@ -273,9 +152,9 @@ module "landing_zone" {
 - **Validation**: Built-in validation prevents overlapping CIDRs
 - **Backward Compatible**: Still supports custom CIDR specification
 
-### Resource Protection with `prevent_destroy`
+### Macie Custom Data Identifiers
 
-The module includes built-in protection for critical resources:
+Configure custom data identifiers for sensitive data detection:
 
 ```hcl
 module "landing_zone" {
@@ -284,72 +163,52 @@ module "landing_zone" {
   account_id = "123456789012"
   region     = "us-east-1"
   
-  # Protect critical resources from accidental deletion
-  prevent_destroy = true  # Default: true for production
-  
-  # For testing environments, set to false for complete cleanup
-  # prevent_destroy = false
+  enable_macie = true
+  macie_custom_data_identifiers = {
+    "credit_card_pattern" = {
+      description  = "Credit card number pattern"
+      regex        = "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+      keywords     = ["credit", "card", "payment"]
+      ignore_words = ["test", "example", "sample"]
+    }
+  }
 }
 ```
 
-**Protected Resources:**
-- S3 buckets (CloudTrail logs, GuardDuty findings)
-- KMS keys (encryption keys)
-- IAM roles and policies
+### Security Hub Action Targets
 
-**Manual Cleanup (when `prevent_destroy = true`):**
-```bash
-# After terraform destroy, manually delete protected resources:
-aws s3 rb s3://your-cloudtrail-bucket-name --force
-aws s3 rb s3://your-guardduty-bucket-name --force
+Configure Security Hub action targets for automated responses:
+
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
+
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  enable_security_hub   = true
+  enable_action_targets = true
+  enable_cis_standard   = true
+}
 ```
 
-## Development
+### Budget Actions
 
-### Git Workflow
+Configure automated budget actions for cost control:
 
-This project uses a **linear history workflow** to maintain clean commit history and simplify release management. See [docs/git-workflow.md](docs/git-workflow.md) for detailed workflow documentation.
+```hcl
+module "landing_zone" {
+  source = "github.com/BGarber42/terraform-aws-secure-landing-zone"
 
-**Key Benefits:**
-- Clean linear commit history
-- No merge commit clutter
-- Easy release management
-- Proper Terraform Registry compatibility
-
-**Quick Workflow:**
-1. Create feature branch from `develop`
-2. Make changes and create PR to `develop`
-3. Merge with rebase to maintain linear history
-4. When ready for release, fast-forward merge `develop` → `main`
-5. Tag and release from `main`
-
-### Testing
-
-Run the Terratest suite locally:
-
-```bash
-cd test
-go test -timeout 30m
+  account_id = "123456789012"
+  region     = "us-east-1"
+  
+  enable_budget_alerts     = true
+  enable_budget_actions    = true
+  budget_limit_usd         = 1000
+  budget_alert_subscribers = ["admin@example.com", "finance@example.com"]
+}
 ```
-
-### GitHub Actions Testing
-
-Run GitHub Actions locally using [act](https://github.com/nektos/act):
-
-```bash
-# Setup secrets
-cp .secrets.example .secrets
-# Edit .secrets with your AWS credentials
-
-# Run all tests
-act --secret-file .secrets -W .github/workflows/ci.yml
-
-# Run specific jobs
-act --secret-file .secrets -W .github/workflows/ci.yml validate
-act --secret-file .secrets -W .github/workflows/ci.yml test
-```
-
-See [docs/local-testing.md](docs/local-testing.md) for detailed instructions.
 
 ## Contributing
 
