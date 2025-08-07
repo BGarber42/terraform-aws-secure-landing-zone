@@ -22,7 +22,7 @@ This repository uses a streamlined CI/CD approach optimized for the linear histo
 
 ### 2. Main Validation (`main-validation.yml`)
 **Trigger:** Commits to `main` branch
-**Purpose:** Full validation and testing for production readiness
+**Purpose:** Essential validation for production readiness
 
 **Jobs:**
 - **Format & Lint:** Terraform formatting and TFLint checks
@@ -32,10 +32,19 @@ This repository uses a streamlined CI/CD approach optimized for the linear histo
 - **Documentation:** Documentation checks
 
 **Benefits:**
-- ✅ Full validation with real AWS resources
+- ✅ Essential validation with real AWS resources
 - ✅ Integration testing with actual infrastructure
 - ✅ Production readiness verification
 - ✅ Comprehensive testing across all examples
+
+### Simplified Protection Strategy
+
+This project uses **minimal branch protection** to reduce workflow friction:
+
+- **Main Branch**: Only essential status checks required (3 checks vs 9 previously)
+- **Develop Branch**: No specific protection rules (flexible development)
+- **Admin Bypass**: Repository owner can merge releases directly
+- **Linear History**: Maintained for clean commit history
 
 ## Workflow Strategy
 

@@ -93,7 +93,7 @@ git reset --hard main
 git push origin develop --force
 ```
 
-> **Note**: For additional release automation scripts, see [`scripts/README.md`](../scripts/README.md).
+
 
 ## Workflow Overview
 
@@ -108,20 +108,15 @@ feature:  A---B---E---F (feature branches)
 ### Main Branch (`main`)
 - **Purpose**: Production-ready code and releases
 - **Protection**: 
-  - Requires 2 approvals
-  - Requires code owner review
+  - Minimal protection with essential status checks only
   - Linear history enforced
-  - Required signatures
-  - Only merge commits allowed
-- **Workflow**: Receives fast-forward merges from `develop` for releases
+  - Admin can bypass restrictions for releases
+- **Workflow**: Receives merges from `develop` for releases
 
 ### Develop Branch (`develop`)
 - **Purpose**: Integration branch for ongoing development
-- **Protection**:
-  - Requires 1 approval
-  - Only rebase merges allowed
-  - Status checks required
-- **Workflow**: Receives rebase merges from feature branches
+- **Protection**: No specific protection rules (simplified workflow)
+- **Workflow**: Receives merges from feature branches
 
 ### Feature Branches
 - **Purpose**: Individual features and fixes
@@ -203,39 +198,50 @@ git push origin develop --force
 
 ## Branch Protection Rules
 
-### Develop Branch
-- ✅ Require pull request reviews before merging
-- ✅ Require 1 approving review
-- ✅ Require status checks to pass before merging
-- ✅ Require branches to be up to date before merging
-- ✅ Require conversation resolution before merging
-- ✅ Allow rebase merging only
+### Simplified Protection Strategy
 
-### Main Branch
-- ✅ Require pull request reviews before merging
-- ✅ Require 2 approving reviews
-- ✅ Require code owner reviews
-- ✅ Require status checks to pass before merging
-- ✅ Require branches to be up to date before merging
-- ✅ Require conversation resolution before merging
-- ✅ Require linear history
-- ✅ Require signed commits
-- ✅ Allow merge commits only
+This project uses a **minimal protection approach** to reduce workflow friction while maintaining essential quality gates.
+
+### Main Branch Protection
+- ✅ **Linear history enforced** (maintains clean commit history)
+- ✅ **Essential status checks required**:
+  - Terraform Format and Lint
+  - Terraform Validate and Plan (basic)
+  - Security Scan
+- ✅ **Admin bypass allowed** (for release management)
+- ✅ **No review requirements** (admin can merge directly)
+
+### Develop Branch
+- ✅ **No specific protection rules** (simplified workflow)
+- ✅ **Standard GitHub PR workflow** (optional reviews)
+- ✅ **Flexible merge options** (rebase, merge, or squash)
+
+### Benefits of Simplified Approach
+- 🚀 **Reduced friction** for development and releases
+- 🎯 **Essential quality gates** maintained
+- 👑 **Admin flexibility** for release management
+- 📝 **Clean linear history** preserved
 
 ## Status Checks
 
-### Develop Branch Checks
-- Terraform Format and Lint
-- Terraform Validate (basic/full/advanced)
-- Security Scan
-- Documentation Check
+### Simplified Check Strategy
 
-### Main Branch Checks
-- Terraform Format and Lint
-- Terraform Validate and Plan (basic/full/advanced)
-- Security Scan
-- Terratest (basic/security/full)
-- Documentation Check
+This project uses **minimal essential checks** to reduce workflow friction while maintaining quality.
+
+### Main Branch Checks (Required)
+- ✅ **Terraform Format and Lint** (code quality)
+- ✅ **Terraform Validate and Plan (basic)** (syntax validation)
+- ✅ **Security Scan** (security analysis)
+
+### Develop Branch Checks (Optional)
+- ✅ **Standard GitHub Actions** (when workflows are triggered)
+- ✅ **No specific requirements** (flexible development workflow)
+
+### Benefits of Minimal Checks
+- 🚀 **Faster feedback** for developers
+- 🎯 **Essential quality gates** maintained
+- 📝 **Reduced complexity** in workflow
+- ⚡ **Quick iterations** for feature development
 
 ## Best Practices
 
@@ -312,13 +318,4 @@ git rebase --continue
 - **Security Scanning**: tfsec integration for security analysis
 - **Testing**: Terratest for infrastructure validation
 
-## Workflow Optimizations
 
-This project includes automated release scripts to streamline the release process. For detailed documentation of these scripts, see [`scripts/README.md`](../scripts/README.md).
-
-### Benefits of Optimization
-- ✅ **Reduced Manual Steps**: Automated CHANGELOG updates
-- ✅ **Consistent Process**: Standardized release workflow
-- ✅ **Error Prevention**: Scripts validate prerequisites
-- ✅ **Clear Instructions**: Built-in guidance for next steps
-- ✅ **Flexible Options**: Choose automated or manual process

@@ -37,6 +37,21 @@ module "landing_zone" {
 }
 ```
 
+### Using OpenTofu
+
+This module is fully compatible with OpenTofu. Simply replace `terraform` commands with `tofu`:
+
+```bash
+# Initialize with OpenTofu
+tofu init
+
+# Plan with OpenTofu
+tofu plan
+
+# Apply with OpenTofu
+tofu apply
+```
+
 ## Important Notes
 
 ### Resources with `prevent_destroy` Protection
@@ -120,14 +135,16 @@ This approach allows complete cleanup including protected resources when `preven
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.9.0 |
-| aws | >= 5.0.0 |
+| terraform | >= 1.5.0 |
+| aws | >= 6.0.0 |
+
+**Note:** This module is also compatible with OpenTofu >= 1.5.0. OpenTofu is a Terraform fork that maintains full compatibility with Terraform modules and providers.
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 5.0.0 |
+| aws | >= 6.0.0 |
 
 ## Inputs
 
