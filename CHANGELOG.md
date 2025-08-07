@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
+## [0.4.4] - 2025-08-07
+
+### Added
+- **CHANGELOG date corrections** to match actual Git commit dates
+- **Release cleanup** to remove outdated releases from GitHub
+
+### Changed
+- **Release dates** corrected to reflect actual commit history
+- **Version consistency** maintained across all documentation
+
+### Technical Details
+- **Date Accuracy**: All release dates now match Git commit timestamps
+- **Release Management**: Streamlined release process for future versions
+- **Documentation**: Improved accuracy of project history
+
 ## [0.4.3] - 2025-08-07
 
 ### Added
