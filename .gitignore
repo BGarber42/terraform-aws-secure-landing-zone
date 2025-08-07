@@ -61,6 +61,10 @@ testing-guide.md
 *.temp
 .secrets
 
+# Branch protection scripts (not committed to git)
+scripts/*-branch-protection.ps1
+scripts/*-branch-protection.sh
+
 # Test artifacts
 test-results/
 coverage/
