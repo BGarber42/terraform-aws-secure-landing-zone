@@ -1,7 +1,8 @@
-variable "account_id" {
-  description = "AWS Account ID"
-  type        = string
-}
+# Account ID is now automatically detected from AWS credentials
+# variable "account_id" {
+#   description = "AWS Account ID"
+#   type        = string
+# }
 
 variable "region" {
   description = "AWS region"

@@ -1,0 +1,52 @@
+# AWS Account ID is automatically detected from AWS credentials
+# No need to specify account_id in terraform.tfvars
+
+# AWS region (optional, defaults to us-east-1)
+region = "us-east-1"
+
+# CloudTrail S3 bucket name (required)
+# Must be globally unique
+cloudtrail_bucket_name = "my-org-cloudtrail-logs-2024"
+
+# GuardDuty findings bucket name (required if GuardDuty is enabled)
+guardduty_findings_bucket_name = "my-org-guardduty-findings-2024"
+
+# KMS key ARN for GuardDuty publishing destination (optional)
+# Leave empty to use default AWS managed key
+guardduty_kms_key_arn = ""
+
+# Security Hub configuration
+enable_security_hub = true
+security_hub_standards = [
+  "arn:aws:securityhub:us-east-1::standards/cis-aws-foundations-benchmark/v/1.2.0",
+  "arn:aws:securityhub:us-east-1::standards/pci-dss/v/3.2.1"
+]
+
+# Macie configuration
+enable_macie = true
+macie_finding_publishing_frequency = "FIFTEEN_MINUTES"
+enable_macie_s3_classification = true
+
+# S3 buckets to scan with Macie (optional)
+macie_s3_buckets_to_scan = [
+  "my-sensitive-data-bucket",
+  "my-pii-data-bucket"
+]
+
+# Budget configuration
+budget_limit_usd = 2000
+budget_alert_subscribers = [
+  "admin@example.com",
+  "finance@example.com",
+  "security@example.com"
+]
+
+# Tags to apply to all resources (optional)
+tags = {
+  Environment = "production"
+  Owner       = "platform-team"
+  Project     = "secure-landing-zone"
+  CostCenter  = "IT-001"
+  Compliance  = "SOC2"
+  DataClassification = "confidential"
+}

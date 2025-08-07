@@ -12,12 +12,15 @@ provider "aws" {
   region = var.region
 }
 
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # This is a placeholder for the landing zone module
 # It will be implemented in subsequent phases
 module "landing_zone" {
   source = "../../modules/landing_zone"
 
-  account_id             = var.account_id
+  account_id             = data.aws_caller_identity.current.account_id
   region                 = var.region
   cloudtrail_bucket_name = var.cloudtrail_bucket_name
   guardduty_kms_key_arn  = var.guardduty_kms_key_arn

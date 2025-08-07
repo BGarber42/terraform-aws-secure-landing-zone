@@ -80,10 +80,9 @@ jobs:
         terraform_version: "1.12.2"
         
     - name: Run tfsec
-      uses: aquasecurity/tfsec-action@v1.0.3
+      uses: aquasecurity/tfsec-sarif-action@v0.1.0
       with:
-        working_directory: .
-        format: sarif
+        sarif_file: tfsec.sarif     
         
     - name: Check if SARIF file exists
       run: |
@@ -135,6 +134,7 @@ jobs:
     - name: Run Terratest
       run: |
         cd test
+        go mod tidy
         go test -timeout 30m -v -run Test${{ matrix.test }}
         
     - name: Upload test results

@@ -12,12 +12,15 @@ provider "aws" {
   region = var.region
 }
 
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # Complete Landing Zone Module
 module "landing_zone" {
   source = "../../modules/landing_zone"
 
   # Account and Region
-  account_id = var.account_id
+  account_id = data.aws_caller_identity.current.account_id
   region     = var.region
 
   # VPC Configuration
