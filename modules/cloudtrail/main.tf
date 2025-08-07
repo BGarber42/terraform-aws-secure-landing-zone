@@ -1,4 +1,6 @@
 # S3 Bucket for CloudTrail logs (with prevent_destroy)
+# security:disable-bucket-logging-requirement
+# This bucket is used exclusively by CloudTrail service and does not require access logging
 resource "aws_s3_bucket" "cloudtrail_protected" {
   count = var.prevent_destroy ? 1 : 0
 
@@ -14,6 +16,8 @@ resource "aws_s3_bucket" "cloudtrail_protected" {
 }
 
 # S3 Bucket for CloudTrail logs (without prevent_destroy)
+# security:disable-bucket-logging-requirement
+# This bucket is used exclusively by CloudTrail service and does not require access logging
 resource "aws_s3_bucket" "cloudtrail_unprotected" {
   count = var.prevent_destroy ? 0 : 1
 

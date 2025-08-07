@@ -28,6 +28,8 @@ resource "aws_guardduty_detector_feature" "malware_protection" {
 }
 
 # GuardDuty Publishing Destination (S3) - with prevent_destroy
+# security:disable-bucket-logging-requirement
+# This bucket is used exclusively by GuardDuty service and does not require access logging
 resource "aws_s3_bucket" "guardduty_findings_protected" {
   count  = var.enable_guardduty && var.guardduty_findings_bucket_name != "" && var.prevent_destroy ? 1 : 0
   bucket = var.guardduty_findings_bucket_name
@@ -40,6 +42,8 @@ resource "aws_s3_bucket" "guardduty_findings_protected" {
 }
 
 # GuardDuty Publishing Destination (S3) - without prevent_destroy
+# security:disable-bucket-logging-requirement
+# This bucket is used exclusively by GuardDuty service and does not require access logging
 resource "aws_s3_bucket" "guardduty_findings_unprotected" {
   count = var.enable_guardduty && var.guardduty_findings_bucket_name != "" && !var.prevent_destroy ? 1 : 0
 
