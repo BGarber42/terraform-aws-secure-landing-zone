@@ -13,7 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-region deployment support
 - Advanced networking configurations
 
-## [0.4.3] - 2024-12-19
+## [0.4.4] - 2025-08-07
+
+### Added
+- **CHANGELOG date corrections** to match actual Git commit dates
+- **Release cleanup** to remove outdated releases from GitHub
+
+### Changed
+- **Release dates** corrected to reflect actual commit history
+- **Version consistency** maintained across all documentation
+
+### Technical Details
+- **Date Accuracy**: All release dates now match Git commit timestamps
+- **Release Management**: Streamlined release process for future versions
+- **Documentation**: Improved accuracy of project history
+
+## [0.4.3] - 2025-08-07
 
 ### Added
 - **OpenTofu compatibility** with full feature support
@@ -36,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Provider Integration**: OpenTofu automatically updates provider registry references
 - **Performance**: OpenTofu often provides faster execution for large configurations
 
-## [0.4.1] - 2024-12-19
+## [0.4.1] - 2025-08-07
 
 ### Added
 - **Optimized Git workflow documentation** with clear release process instructions
@@ -61,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Moved script documentation to `scripts/README.md` for better organization
 - **Workflow**: Maintained linear history while supporting both automated and manual release processes
 
-## [0.3.0] - 2024-08-07
+## [0.3.0] - 2025-08-07
 
 ### Added
 - **Configurable `prevent_destroy` variable** with dual-bucket approach for S3 resources
@@ -100,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Root module**: Passes `prevent_destroy` variable to sub-modules
 - **Test deployment**: Automatically sets `prevent_destroy = false` for complete cleanup
 
-## [0.2.0] - 2024-08-06
+## [0.2.0] - 2025-08-06
 
 ### Added
 - Complete AWS Landing Zone implementation
@@ -122,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation enhanced with architecture diagrams
 - CI/CD pipeline optimized for security and compliance
 
-## [0.1.0] - 2024-01-15
+## [0.1.0] - 2025-07-15
 
 ### Added
 - Initial project setup
