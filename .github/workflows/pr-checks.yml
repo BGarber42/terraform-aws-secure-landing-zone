@@ -2,7 +2,7 @@ name: PR Checks
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: "1.12.2"
+        terraform_version: "1.5.0"
         
     - name: Terraform Format Check
       run: terraform fmt -check -recursive
@@ -52,7 +52,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: "1.12.2"
+        terraform_version: "1.5.0"
         
     - name: Terraform Init and Validate
       run: |
@@ -71,7 +71,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: "1.12.2"
+        terraform_version: "1.5.0"
         
     - name: Run tfsec
       uses: aquasecurity/tfsec-sarif-action@v0.1.0

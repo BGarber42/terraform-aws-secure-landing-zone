@@ -1,15 +1,18 @@
-# Git Workflow: Linear History
+# Git Workflow: Main + Feature Branches
 
-This project uses a linear history workflow to maintain clean commit history and simplify release management.
+This project uses a simplified workflow optimized for solo development with external contributions. Small changes go directly to main, while larger features use feature branches.
 
 ## Quick Reference
 
-### 1. Creating a New Feature
+### 1. Small Changes (Direct to Main)
 ```bash
-# Start from develop
-git checkout develop
-git pull origin develop
+# Quick fixes, documentation updates, small tweaks
+git commit -m "docs: fix typo in README"
+git push origin main
+```
 
+### 2. Larger Features (Feature Branches)
+```bash
 # Create feature branch
 git checkout -b feature/your-feature-name
 
@@ -18,88 +21,36 @@ git add .
 git commit -m "feat: add new feature"
 git push origin feature/your-feature-name
 
-# Create PR: feature → develop
-gh pr create --title "feat: add new feature" --base develop
+# Create PR: feature → main
+gh pr create --title "feat: add new feature" --base main
 ```
 
-### 2. Merging Feature to Develop
+### 3. External Contributions
 ```bash
-# Review PR in GitHub
-# Ensure all checks pass
-# Get required approval (1 reviewer)
-# Merge with rebase to maintain linear history
-gh pr merge <PR_NUMBER> --rebase
+# Contributors fork and create feature branches
+git checkout -b feature/external-contribution
+# ... work ...
+git push origin feature/external-contribution
+# Create PR: feature/external-contribution → main
 ```
 
-### 3. Creating a Versioned Release
-
-#### Option A: Direct Release (Recommended)
+### 4. Creating a Versioned Release
 ```bash
-# Create release branch from develop
-git checkout develop
-git checkout -b release/v1.2.3
-
 # Update CHANGELOG.md with release notes
-# Edit CHANGELOG.md
 git add CHANGELOG.md
 git commit -m "docs: update CHANGELOG for v1.2.3"
-git push origin release/v1.2.3
-
-# Merge develop into main
-git checkout main
-git merge develop --no-ff -m "Release v1.2.3"
-
-# Create version tag
-git tag v1.2.3
 git push origin main
-git push origin v1.2.3
 
-# Create GitHub release
-gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
-
-# Reset develop to match main
-git checkout develop
-git reset --hard main
-git push origin develop --force
-```
-
-#### Option B: PR-Based Release
-```bash
-# Create release branch from develop
-git checkout develop
-git checkout -b release/v1.2.3
-
-# Update CHANGELOG.md with release notes
-# Edit CHANGELOG.md
-git add CHANGELOG.md
-git commit -m "docs: update CHANGELOG for v1.2.3"
-git push origin release/v1.2.3
-
-# Create PR: release → main
-gh pr create --title "Release v1.2.3" --base main
-
-# After PR is merged, create tag and release
-git checkout main
-git pull origin main
+# Create tag and release
 git tag v1.2.3
 git push origin v1.2.3
-
-# Create GitHub release
 gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
-
-# Reset develop to match main
-git checkout develop
-git reset --hard main
-git push origin develop --force
 ```
-
-
 
 ## Workflow Overview
 
 ```
-main:     A---B---C---D (release commits)
-develop:  A---B---C---D (development commits)
+main:     A---B---C---D (stable releases)
 feature:  A---B---E---F (feature branches)
 ```
 
@@ -108,99 +59,81 @@ feature:  A---B---E---F (feature branches)
 ### Main Branch (`main`)
 - **Purpose**: Production-ready code and releases
 - **Protection**: 
-  - Minimal protection with essential status checks only
   - Linear history enforced
+  - Essential status checks required
   - Admin can bypass restrictions for releases
-- **Workflow**: Receives merges from `develop` for releases
-
-### Develop Branch (`develop`)
-- **Purpose**: Integration branch for ongoing development
-- **Protection**: No specific protection rules (simplified workflow)
-- **Workflow**: Receives merges from feature branches
+- **Workflow**: Receives direct commits for small changes, PRs for features
 
 ### Feature Branches
 - **Purpose**: Individual features and fixes
 - **Naming**: `feature/description` or `fix/description`
-- **Workflow**: Created from `develop`, merged back via PR with rebase
+- **Workflow**: Created from `main`, merged back via PR
 
 ## Development Process
 
-### 1. Starting New Work
+### 1. Small Changes (Direct to Main)
 ```bash
-# Ensure develop is up to date
-git checkout develop
-git pull origin develop
+# Ensure main is up to date
+git checkout main
+git pull origin main
+
+# Make small changes
+git add .
+git commit -m "docs: fix typo"
+git push origin main
+```
+
+### 2. Larger Features (Feature Branches)
+```bash
+# Ensure main is up to date
+git checkout main
+git pull origin main
 
 # Create feature branch
 git checkout -b feature/your-feature-name
-```
 
-### 2. Making Changes
-```bash
 # Make your changes
 git add .
 git commit -m "feat: add new feature"
 
 # Push to remote
 git push origin feature/your-feature-name
+
+# Create PR for review
+gh pr create --title "feat: add new feature" --base main
 ```
 
-### 3. Creating Pull Request
-- Create PR from feature branch → `develop`
-- Ensure all status checks pass
-- Get required approvals
-- Merge with rebase (maintains linear history)
+### 3. External Contributions
+- Contributors fork the repository
+- Create feature branches from main
+- Submit PRs for review
+- Maintainer reviews and merges
 
 ### 4. Release Process
 ```bash
 # When ready for release
-# 1. Create release branch from develop
-git checkout develop
-git checkout -b release/v1.2.3
-
-# 2. Update CHANGELOG.md with release notes
-# Edit CHANGELOG.md with release notes
+# 1. Update CHANGELOG.md with release notes
 git add CHANGELOG.md
 git commit -m "docs: update CHANGELOG for v1.2.3"
-git push origin release/v1.2.3
+git push origin main
 
-# 3. Create PR: release → main
-gh pr create --title "Release v1.2.3" --base main
-
-# 4. After PR is merged, create tag and release
-git checkout main
-git pull origin main
+# 2. Create tag and release
 git tag v1.2.3
 git push origin v1.2.3
 
-# 5. Create GitHub release
+# 3. Create GitHub release
 gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
-
-# 6. Reset develop to match main
-git checkout develop
-git reset --hard main
-git push origin develop --force
-```
-
-### 5. Post-Release Cleanup
-```bash
-# Develop branch is automatically reset to match main
-# This maintains linear history and prepares for next development cycle
 ```
 
 ## Benefits
 
-1. **Clean History**: Single linear commit history
-2. **Easy Releases**: Simple fast-forward merges
-3. **Terraform Registry**: Clean history important for module releases
-4. **No Merge Clutter**: No unnecessary merge commits
-5. **Clear Ownership**: Each commit has clear ownership
+1. **Fast Iteration**: Small changes go directly to main
+2. **Simple Workflow**: No develop branch overhead
+3. **Secure External PRs**: Protected main branch
+4. **Clean History**: Linear history maintained
+5. **Flexible**: Feature branches when needed
 
 ## Branch Protection Rules
-
-### Simplified Protection Strategy
-
-This project uses a **minimal protection approach** to reduce workflow friction while maintaining essential quality gates.
 
 ### Main Branch Protection
 - ✅ **Linear history enforced** (maintains clean commit history)
@@ -209,39 +142,24 @@ This project uses a **minimal protection approach** to reduce workflow friction 
   - Terraform Validate and Plan (basic)
   - Security Scan
 - ✅ **Admin bypass allowed** (for release management)
-- ✅ **No review requirements** (admin can merge directly)
 
-### Develop Branch
-- ✅ **No specific protection rules** (simplified workflow)
+### Feature Branches
+- ✅ **No specific protection rules** (flexible development)
 - ✅ **Standard GitHub PR workflow** (optional reviews)
 - ✅ **Flexible merge options** (rebase, merge, or squash)
 
-### Benefits of Simplified Approach
-- 🚀 **Reduced friction** for development and releases
-- 🎯 **Essential quality gates** maintained
-- 👑 **Admin flexibility** for release management
-- 📝 **Clean linear history** preserved
-
 ## Status Checks
-
-### Simplified Check Strategy
-
-This project uses **minimal essential checks** to reduce workflow friction while maintaining quality.
 
 ### Main Branch Checks (Required)
 - ✅ **Terraform Format and Lint** (code quality)
 - ✅ **Terraform Validate and Plan (basic)** (syntax validation)
 - ✅ **Security Scan** (security analysis)
 
-### Develop Branch Checks (Optional)
-- ✅ **Standard GitHub Actions** (when workflows are triggered)
-- ✅ **No specific requirements** (flexible development workflow)
-
-### Benefits of Minimal Checks
-- 🚀 **Faster feedback** for developers
-- 🎯 **Essential quality gates** maintained
-- 📝 **Reduced complexity** in workflow
-- ⚡ **Quick iterations** for feature development
+### PR Checks (Required for External Contributions)
+- ✅ **Terraform Format and Lint** (code quality)
+- ✅ **Terraform Validate** (syntax validation)
+- ✅ **Security Scan** (security analysis)
+- ✅ **Documentation Check** (structure validation)
 
 ## Best Practices
 
@@ -257,22 +175,15 @@ This project uses **minimal essential checks** to reduce workflow friction while
    - `docs/update-readme`
 
 3. **Small Commits**: Keep commits focused and small
-4. **Regular Updates**: Keep feature branches up to date with develop
+4. **Regular Updates**: Keep feature branches up to date with main
 5. **Clean History**: Squash commits when appropriate during PR review
 
 ## Troubleshooting
 
-### If develop is behind main
-```bash
-git checkout develop
-git rebase main
-git push origin develop --force
-```
-
-### If feature branch is behind develop
+### If feature branch is behind main
 ```bash
 git checkout feature/your-branch
-git rebase develop
+git rebase main
 git push origin feature/your-branch --force
 ```
 
@@ -283,39 +194,20 @@ git add .
 git rebase --continue
 ```
 
-## Simplified Release Workflow
+### For external contributors
+- Fork the repository
+- Create feature branch from main
+- Submit PR for review
+- Maintainer reviews and merges
 
-### When Release Branches Are Required
-- **Branch Protection**: Develop branch requires PR reviews, cannot commit directly
-- **Release Preparation**: Need to update CHANGELOG.md and prepare release notes
-- **Linear History**: Release script expects develop → main workflow
-- **Status Checks**: Release branches allow proper CI/CD validation
+## Notes
 
-### Release Process (With Release Branches)
-1. **Create release branch** from develop
-2. **Update CHANGELOG.md** with release notes in release branch
-3. **Create PR** from release branch to main (for status checks)
-4. **Merge PR** and create version tag
-5. **Create GitHub release** with changelog notes
-6. **Reset develop** to match main for linear history
+### Commits Between Tags
+**Note:** Commits between tags may be in various states of development. For production use, always reference a specific tagged release.
 
-### When to Skip Release Branches
-- **Hotfixes**: Direct develop → main for urgent fixes
-- **Simple Releases**: When no CHANGELOG updates needed
-- **Automated Releases**: When CI/CD handles release preparation
-
-## Release Management
-
-1. **Versioning**: Use semantic versioning (MAJOR.MINOR.PATCH)
-2. **Changelog**: Update CHANGELOG.md with release notes
-3. **Tagging**: Tag releases with version numbers
-4. **Terraform Registry**: Releases are automatically published to registry
-
-## Integration with CI/CD
-
-- **PR Checks**: Lightweight validation for develop branch
-- **Main Validation**: Comprehensive validation for main branch
-- **Security Scanning**: tfsec integration for security analysis
-- **Testing**: Terratest for infrastructure validation
+### External Contributions
+- All external contributions require review before merging to main
+- Feature branches provide isolation for external work
+- PR process ensures quality and security
 
 
