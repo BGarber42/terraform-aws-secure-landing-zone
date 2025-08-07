@@ -18,7 +18,7 @@ func TestConfigModule(t *testing.T) {
 	bucketName := "test-config-" + uniqueID
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/config",
+		TerraformDir: "../modules/config",
 		Vars: map[string]interface{}{
 			"account_id":         accountID,
 			"region":             "us-east-1",

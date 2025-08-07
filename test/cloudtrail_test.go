@@ -18,7 +18,7 @@ func TestCloudTrailModule(t *testing.T) {
 	bucketName := "test-cloudtrail-" + uniqueID
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/cloudtrail",
+		TerraformDir: "../modules/cloudtrail",
 		Vars: map[string]interface{}{
 			"account_id":             accountID,
 			"region":                 "us-east-1",

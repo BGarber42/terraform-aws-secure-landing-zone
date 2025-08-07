@@ -23,7 +23,7 @@ func TestLandingZoneBasic(t *testing.T) {
 
 	// Configure Terraform options
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone",
+		TerraformDir: "..",
 		Vars: map[string]interface{}{
 			"account_id":                     accountID,
 			"region":                         "us-east-1",

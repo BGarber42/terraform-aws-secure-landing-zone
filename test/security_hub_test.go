@@ -15,7 +15,7 @@ func TestSecurityHubModule(t *testing.T) {
 	accountID := aws.GetAccountId(t)
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../modules/landing_zone/security_hub",
+		TerraformDir: "../modules/security_hub",
 		Vars: map[string]interface{}{
 			"account_id":            accountID,
 			"region":                "us-east-1",
