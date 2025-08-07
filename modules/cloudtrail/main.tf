@@ -8,9 +8,9 @@ resource "aws_s3_bucket" "cloudtrail_protected" {
     Name = "cloudtrail-logs-bucket"
   })
 
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # S3 Bucket for CloudTrail logs (without prevent_destroy)
