@@ -41,52 +41,13 @@ resource "aws_guardduty_detector_feature" "malware_protection" {
   status      = "ENABLED"
 }
 
-# KMS Key for GuardDuty findings encryption
-resource "aws_kms_key" "guardduty_findings" {
-  count = var.enable_guardduty ? 1 : 0
-
-  description             = "KMS key for GuardDuty findings encryption"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "Enable IAM User Permissions"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${var.account_id}:root"
-        }
-        Action   = "kms:*"
-        Resource = "*"
-      },
-      {
-        Sid    = "Allow GuardDuty to use the key"
-        Effect = "Allow"
-        Principal = {
-          Service = "guardduty.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-
-  tags = merge(var.tags, {
-    Name = "guardduty-findings-key"
-  })
+# Data source to reference shared S3 encryption key
+data "aws_kms_key" "s3_encryption" {
+  key_id = "alias/s3-encryption"
 }
 
-# KMS Alias for GuardDuty findings
-resource "aws_kms_alias" "guardduty_findings" {
-  count         = var.enable_guardduty ? 1 : 0
-  name          = "alias/guardduty-findings"
-  target_key_id = aws_kms_key.guardduty_findings[0].key_id
-}
+# Note: Using shared S3 encryption key from CloudTrail module
+# This reduces KMS key proliferation while maintaining security
 
 # GuardDuty Publishing Destination (S3)
 resource "aws_s3_bucket" "guardduty_findings" {
@@ -119,7 +80,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "guardduty_finding
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.guardduty_findings[0].arn
+      kms_master_key_id = data.aws_kms_key.s3_encryption.arn
       sse_algorithm     = "aws:kms"
     }
   }
@@ -177,7 +138,7 @@ resource "aws_guardduty_publishing_destination" "main" {
   detector_id      = aws_guardduty_detector.main[0].id
   destination_type = "S3"
   destination_arn  = aws_s3_bucket.guardduty_findings[0].arn
-  kms_key_arn      = aws_kms_key.guardduty_findings[0].arn
+  kms_key_arn      = data.aws_kms_key.s3_encryption.arn
 
   depends_on = [aws_s3_bucket_policy.guardduty_findings]
 } 

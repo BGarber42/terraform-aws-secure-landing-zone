@@ -12,11 +12,11 @@ provider "aws" {
   region = var.region
 }
 
-# KMS Key for SNS topic encryption
-resource "aws_kms_key" "budget_sns" {
+# KMS Key for SNS topic encryption (shared across Config and Budget)
+resource "aws_kms_key" "sns_notifications" {
   count = var.enable_budget_alerts ? 1 : 0
 
-  description             = "KMS key for budget SNS topic encryption"
+  description             = "KMS key for SNS topic encryption"
   deletion_window_in_days = 7
   enable_key_rotation     = true
 
@@ -45,6 +45,18 @@ resource "aws_kms_key" "budget_sns" {
         Resource = "*"
       },
       {
+        Sid    = "Allow Config to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "config.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "Allow Budgets to use the key"
         Effect = "Allow"
         Principal = {
@@ -60,15 +72,15 @@ resource "aws_kms_key" "budget_sns" {
   })
 
   tags = merge(var.tags, {
-    Name = "budget-sns-key"
+    Name = "sns-notifications-key"
   })
 }
 
-# KMS Alias for budget SNS
-resource "aws_kms_alias" "budget_sns" {
+# KMS Alias for SNS notifications
+resource "aws_kms_alias" "sns_notifications" {
   count         = var.enable_budget_alerts ? 1 : 0
-  name          = "alias/budget-sns"
-  target_key_id = aws_kms_key.budget_sns[0].key_id
+  name          = "alias/sns-notifications"
+  target_key_id = aws_kms_key.sns_notifications[0].key_id
 }
 
 # SNS Topic for budget notifications
@@ -76,7 +88,7 @@ resource "aws_sns_topic" "budget" {
   count = var.enable_budget_alerts ? 1 : 0
 
   name              = "landing-zone-budget-alerts"
-  kms_master_key_id = aws_kms_key.budget_sns[0].arn
+  kms_master_key_id = aws_kms_key.sns_notifications[0].arn
 
   tags = merge(var.tags, {
     Name = "landing-zone-budget-alerts"

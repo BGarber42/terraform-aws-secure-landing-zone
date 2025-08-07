@@ -34,9 +34,78 @@ resource "aws_iam_role" "config" {
   })
 }
 
+# KMS Key for SNS topic encryption (shared across Config and Budget)
+resource "aws_kms_key" "sns_notifications" {
+  description             = "KMS key for SNS topic encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${var.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow SNS to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Config to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "config.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Budgets to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "budgets.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "sns-notifications-key"
+  })
+}
+
+# KMS Alias for SNS notifications
+resource "aws_kms_alias" "sns_notifications" {
+  name          = "alias/sns-notifications"
+  target_key_id = aws_kms_key.sns_notifications.key_id
+}
+
 # SNS Topic for AWS Config notifications
 resource "aws_sns_topic" "config" {
-  name = "aws-config-notifications"
+  name              = "aws-config-notifications"
+  kms_master_key_id = aws_kms_key.sns_notifications.arn
 
   tags = merge(var.tags, {
     Name = "aws-config-notifications"
