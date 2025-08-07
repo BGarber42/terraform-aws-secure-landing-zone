@@ -135,4 +135,3 @@ dev_override.tf
 prod_override.tf
 
 # Ignore misc files
-TODO.md
